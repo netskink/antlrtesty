@@ -1,5 +1,9 @@
 # JFD ignore the testy dir
 testy/
+gn/
+ninja/
+examples/
+testy/
 
 
 # Compiled class file
