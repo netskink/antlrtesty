@@ -1,3 +1,7 @@
+# JFD ignore the testy dir
+testy/
+
+
 # Compiled class file
 *.class
 
