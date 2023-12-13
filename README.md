@@ -1,2 +1,3 @@
 # antlrtesty
-learn some antlr
+
+Just learning how to use antlr, gn, and ninja

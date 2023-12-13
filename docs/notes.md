@@ -1,3 +1,8 @@
+
+# General purpose notes
+
+## Install and obtain code
+
 On linux store the jar in `/usr/local/lib`
 
 Using capital O to get output file, retrieve the jar and store in `/usr/local/lib` or in `jars` directory.

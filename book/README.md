@@ -1,1 +1,3 @@
-Sample code from https://media.pragprog.com/titles/tpantlr2/code
+# Project antlr
+
+Just learning how to use antlr, gn, and ninja

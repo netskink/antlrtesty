@@ -1,6 +1,3 @@
-
-
-
 # gn
 
 Starter commands:
@@ -9,33 +6,51 @@ Starter commands:
 * gn help dotfile
 * touch .gn
 * gn gen out
+* gn -v xxxx to run in verbose mode
 
 
 ## Components
 
 * .gn is the top level file that identifies a gn project.  It is at the root of the project.
 * BUILD.gn are in each directory of the project
-*
+* BUILDCONFIG.gn
 
 ## creating a simple C++ build
 
-Use this directory
-* examples/simple_build/
+Use this directory to demo a tiered c++ build. 
+
+* src/gncc/
 
 Need to make sure you use spaces and not tabs
+
+### Command Sequence
+
+```
+$ cd src/gncc
+# set environment
+$ . /workspaces/antlrtesty/bin/setenv.sh 
+# use gn to generate ninja files
+$ gn gen out
+# build source using ninja
+$ ninja -C out tutorial 
+# Test run the result
+$ ./out/tutorial 
+```
+
 
 ### Contents:
 
 ```
-examples/simple_build/.gn      <-   copied from gn/examples
-examples/build/
-examples/build/BUILD.gn
-examples/build/BUILDCONFIG.gn  <-   referenced by .gn file
-examples/toolchain/BUILD.gn    <-   copied from gn/examples
+src/gncc/.gn                   <-   copied from gn/examples/simple_build
+src/gncc/build/                <-   transcribed from gn quickstart url
+src/gncc/build/BUILD.gn        <-   transcribed from gn quickstart url
+src/gncc/build/BUILDCONFIG.gn  <-   ditto
+src/gncc/toolchain/BUILD.gn    <-   copied from gn/examples/simple_build
 
 ```
 
-## simple_build/BUILD.gn
+
+## src/gncc/BUILD.gn
 
 [This came from the quickstart step by step]([Title](https://gn.googlesource.com/gn/%252B/main/docs/quick_start.md#Step_by_step))
 
@@ -50,7 +65,7 @@ group("tools") {
 }
 ```
 
-## simple_build/tutorial/BUILD.gn
+## src/gncc/tutorial/BUILD.gn
 
 This also came from the quickstart guide
 
@@ -62,7 +77,7 @@ executable("tutorial") {
 }
 ```
 
-## simple_build/build/BUILD.gn
+## src/gncc/build/BUILD.gn
 
 ```
 config("compiler_defaults") {
@@ -84,7 +99,7 @@ config("executable_ldconfig") {
 }
 ```
 
-## simple_build/build/BUILDCONFIG.gn
+## src/gncc/build/BUILDCONFIG.gn
 
 ```
 if (target_os == "") {
