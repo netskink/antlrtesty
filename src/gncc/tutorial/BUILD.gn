@@ -1,0 +1,6 @@
+executable("tutorial") {
+  sources = [
+    "tutorial.cc",
+  ]
+}
+

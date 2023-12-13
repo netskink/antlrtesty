@@ -1,9 +1,31 @@
-# JFD ignore the testy dir
-testy/
+#
+# JFD Mods Begin
+#
+
+# This is git repo for the gn source code
 gn/
-ninja/
-examples/
+# any ninja files built by gn
+.ninja_deps
+.ninja_log
+*.ninja
+
+# This is the example code for the antlr4 book
+#book/
+
+# This is a temp dir
 testy/
+
+# This is for src build artifacts
+# gn build c++
+src/gncc/out
+
+
+#
+# JFD Mods Begin
+#
+
+
+
 
 
 # Compiled class file
