@@ -12,10 +12,27 @@
 
 * gn gen out
 
+Generates ninja files from the current tree and puts them in the given output directory - out/.  See `$ gn help gen`
+
+```
+$ gn gen out
+```
+
 
 ### Cleaning gn output - removing ninja files
 
-* gn clean out - removes out/obj and out/toolchain.ninja
+
+This command will also delete the ninja build results.  It will
+preserve some gn output files though.  For instance, these files
+will persist:
+
+```
+$ gn clean out
+```
+
+* out/args.gn
+* out/build.ninja.d
+* out/build.ninja
 
 
 ### Notable gn options
@@ -24,6 +41,8 @@
 
 
 ## Components
+
+Essential files to create a ninja project
 
 * .gn is the top level file that identifies a gn project.  It is at the root of the project.
 * BUILD.gn are in each directory of the project
@@ -77,24 +96,33 @@ src/gncc/out/build.ninja
 src/gncc/out/build.ninja.d
 src/gncc/out/build.ninja.stamp
 src/gncc/out/obj
-```
-
-Stuff created by `ninja -C out tutorial`
-
+src/gncc/out/obj/tutorial
+src/gncc/out/obj/tutorial/tutorial.ninja
 
 ```
-src/gncc/out                   
-src/gncc/out/args.gn
-src/gncc/out/build.ninja
-src/gncc/out/build.ninja.d
-src/gncc/out/build.ninja.stamp
-src/gncc/out/obj
+
+Stuff created by `ninja`
+
+You can do either command sequence and the result is the same
+
+* `ninja -C out`
+* `ninja -C out tutorial`
+
+
+
+```
+out/.ninja_log
+out/.ninja_deps
+out/build.ninja.stamp
+out/tutorial
+out/obj/tools.stamp 
+out/obj/tutorial/tutorial.tutorial.o
 ```
 
 
 ## src/gncc/BUILD.gn
 
-[This came from the quickstart step by step]([Title](https://gn.googlesource.com/gn/%252B/main/docs/quick_start.md#Step_by_step))
+Sample quick start files.  These all came from the quickstart [step by step]([Title](https://gn.googlesource.com/gn/%252B/main/docs/quick_start.md#Step_by_step))
 
 
 ```
