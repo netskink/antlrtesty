@@ -1,11 +1,25 @@
 # gn
 
-Starter commands:
+
+## Commands
+
+### Getting help
 
 * gn help gen
 * gn help dotfile
-* touch .gn
+
+### Building Ninja Files
+
 * gn gen out
+
+
+### Cleaning gn output - removing ninja files
+
+* gn clean out - removes out/obj and out/toolchain.ninja
+
+
+### Notable gn options
+
 * gn -v xxxx to run in verbose mode
 
 
@@ -38,7 +52,11 @@ $ ./out/tutorial
 ```
 
 
+
+
 ### Contents:
+
+#### Required
 
 ```
 src/gncc/.gn                   <-   copied from gn/examples/simple_build
@@ -46,7 +64,31 @@ src/gncc/build/                <-   transcribed from gn quickstart url
 src/gncc/build/BUILD.gn        <-   transcribed from gn quickstart url
 src/gncc/build/BUILDCONFIG.gn  <-   ditto
 src/gncc/toolchain/BUILD.gn    <-   copied from gn/examples/simple_build
+```
 
+#### Generated
+
+Stuff created by `gn gen out`
+
+```
+src/gncc/out                   
+src/gncc/out/args.gn
+src/gncc/out/build.ninja
+src/gncc/out/build.ninja.d
+src/gncc/out/build.ninja.stamp
+src/gncc/out/obj
+```
+
+Stuff created by `ninja -C out tutorial`
+
+
+```
+src/gncc/out                   
+src/gncc/out/args.gn
+src/gncc/out/build.ninja
+src/gncc/out/build.ninja.d
+src/gncc/out/build.ninja.stamp
+src/gncc/out/obj
 ```
 
 
