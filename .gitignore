@@ -18,6 +18,12 @@ testy/
 # This is for src build artifacts
 # gn build c++
 src/gncc/out
+# gn build java
+src/gnjava/out
+# my gn build java using modified ninja_syntax.py 
+src/mygnjava/out
+
+
 
 
 #

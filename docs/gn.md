@@ -83,6 +83,8 @@ src/gncc/build/                <-   transcribed from gn quickstart url
 src/gncc/build/BUILD.gn        <-   transcribed from gn quickstart url
 src/gncc/build/BUILDCONFIG.gn  <-   ditto
 src/gncc/toolchain/BUILD.gn    <-   copied from gn/examples/simple_build
+src/gncc/tutorial/BUILD.gn     <-   copied from gn/examples/simple_build
+src/gncc/tutorial/tutorial.cc. <-   copied from gn/examples/simple_build
 ```
 
 #### Generated

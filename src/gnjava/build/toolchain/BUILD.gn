@@ -1,0 +1,19 @@
+toolchain("javac") {
+  tool("cc") {
+    command = "javac  {{source}} -d {{output}}"
+    description = "JAVAC {{output}}"
+    outputs =
+        [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.class" ]
+  }
+
+
+  tool("stamp") {
+    command = "touch {{output}}"
+    description = "STAMP {{output}}"
+  }
+
+  tool("copy") {
+    command = "cp -af {{source}} {{output}}"
+    description = "COPY {{source}} {{output}}"
+  }
+}
