@@ -28,6 +28,8 @@ src/gnjava/out
 # my gn build java using modified ninja_syntax.py 
 src/mygnjava/out
 src/mygnjava/__pycache__
+src/mygnjava2/out
+src/mygnjava2/__pycache__
 
 # Omit the python venv
 src/env
