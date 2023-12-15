@@ -24,5 +24,9 @@ curl -O https://media.pragprog.com/titles/tpantlr2/code/tpantlr2-code.zip
 ```
 
 
+# on macOS
 
+To turn off annoying period insertion:
+
+* System Preferences -> Keyboard -> Text Input -> Edit (input Sources) -> toggle "Add period with double-space"
 

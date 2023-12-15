@@ -5,3 +5,9 @@
 * [Sample code]( https://media.pragprog.com/titles/tpantlr2/code)
 * [gn quickstart step by step](https://gn.googlesource.com/gn/%252B/main/docs/quick_start.md#Step_by_step)
 * [ninja]( https://ninja-build.org/manual.html)
+* [lwn article on ninja 2016](https://lwn.net/Articles/706404/)
+
+
+# BALSA things
+* [Title](https://huggingface.co/TheBloke/deepseek-coder-33B-instruct-GGUF)
+* [Title](https://github.com/deepseek-ai/deepseek-coder)
