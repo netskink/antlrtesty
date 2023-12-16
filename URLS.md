@@ -8,6 +8,3 @@
 * [lwn article on ninja 2016](https://lwn.net/Articles/706404/)
 
 
-# BALSA things
-* [Title](https://huggingface.co/TheBloke/deepseek-coder-33B-instruct-GGUF)
-* [Title](https://github.com/deepseek-ai/deepseek-coder)
