@@ -30,6 +30,13 @@ src/mygnjava/out
 src/mygnjava/__pycache__
 src/mygnjava2/out
 src/mygnjava2/__pycache__
+src/antlrhw/out
+src/antlrhw/__pycache__
+src/antlrhw/hello/*.java
+src/antlrhw/hello/.antlr/*
+
+
+
 
 # Omit the python venv
 src/env
