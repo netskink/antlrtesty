@@ -2,6 +2,10 @@
 
 Note on Ninja
 
+* ninja does not support shell aliases
+* ninja does not support wildcards
+* ninja uses `$` for both line continuatino and variable expansion
+
 ## Command args
 
 The best way to find out args for ninja is to use `man`

@@ -60,12 +60,16 @@ Need to make sure you use spaces and not tabs
 
 ```
 $ cd src/gncc
+
 # set environment
 $ . /workspaces/antlrtesty/bin/setenv.sh 
+
 # use gn to generate ninja files
 $ gn gen out
+
 # build source using ninja
 $ ninja -C out tutorial 
+
 # Test run the result
 $ ./out/tutorial 
 ```
