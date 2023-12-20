@@ -30,6 +30,7 @@ $ ninja -t clean
 Now, all I need to do is get the configure.py script to build the equivalent of this
 
 ```
+
 #
 # Variables
 #
@@ -59,7 +60,9 @@ $outdir/hello/HelloLexer.tokens $
 $outdir/hello/HelloBaseListener.java $
 $outdir/hello/HelloLexer.java $
 $outdir/hello/HelloListener.java $
-$outdir/hello/HelloParser.java: antlr_r hello/Hello.g4
+$outdir/hello/HelloParser.java $
+$outdir/hello $
+: antlr_r hello/Hello.g4
 
 
 # rule to compile java code
@@ -71,20 +74,15 @@ rule jc
 build $outdir/HelloLexer.class: jc $outdir/hello/HelloLexer.java
 
 # depends upon HelloListener
-#build $outdir/HelloBaseListener.class: jc $outdir/hello/HelloBaseListener.java
+build $outdir/HelloBaseListener.class: jc $outdir/hello/HelloBaseListener.java
 
 # depends upon HelloParser
 build $outdir/HelloListener.class: jc $outdir/hello/HelloListener.java
 
 # depends upon HelloListener
-#build $outdir/HelloParser.class: jc $outdir/hello/HelloParser.java
-
-# depends upon HelloListener
 build $outdir/HelloParser$$RContext.class $outdir/HelloParser.class: jc $outdir/hello/HelloParser.java
 
 
-rule mkdir_r
-  command = mkdir $in
 
 
 
@@ -97,6 +95,6 @@ rule testit
   command = cd $outdir; echo hello john | $grun Hello r -tokens 
   description = Testing the tokenizer
 
-build do_testit: testit $outdir/HelloParser$$RContext.class
+build $outdir do_testit: testit $outdir/HelloParser$$RContext.class
 ```
 
