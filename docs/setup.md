@@ -43,3 +43,10 @@
     * `cd src/antlrhw`
     * `cp build.ninja.works build.ninja`
     * `ninja`
+        * builds the sample code
+    * `ninja -t clean`
+        * cleans the build results
+4. Test using the `configure.py` script
+    * `./configure.py`
+    * `ninja`
+    * `ninja -t clean`
