@@ -1,0 +1,8 @@
+out
+__pycache__
+starter/
+starter/*
+tour/*.java
+tour/*.interp
+tour/*.tokens
+tour/.antlr/*
