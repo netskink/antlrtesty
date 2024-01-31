@@ -6,3 +6,7 @@ tour/*.java
 tour/*.interp
 tour/*.tokens
 tour/.antlr/*
+tour2/*.java
+tour2/*.interp
+tour2/*.tokens
+tour2/.antlr/*
