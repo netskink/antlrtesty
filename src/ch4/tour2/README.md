@@ -12,7 +12,7 @@ This is an improvement in that it breaks up the grammar into
 ### Build
 
 ```
-$ antlr4 Expr.g4
+$ antlr4 LibExpr.g4
 ```
 
 ### Test
@@ -21,15 +21,24 @@ $ antlr4 Expr.g4
 * `t.expr` is the sample script we are parsing
 
 ```
-$ grun Expr prog -gui t.expr
+$ grun LibExpr prog -gui t.expr
 ```
 
 
 ### Custom test program
 
 This code shows how to construct all the necessary components to parse
-the sample script similar to using grun
+the sample script similar to using grun.
+
+Note, it now uses LibExpr rather Expr.  I probably should have renamed it to
+LibExprJoyRide....
+
+This workflow demos how it handles errors with the missing trailing parenthesis.
 
 ```
-$ 
+$ javac ExprJoyRide
+$ java ExprJoyRide
+(1+2
+3
+eof
 ```

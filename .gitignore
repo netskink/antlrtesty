@@ -2,6 +2,9 @@
 # JFD Mods Begin
 #
 
+# for finder
+.DS_Store
+
 # This is git repo for the gn source code
 gn/
 # any ninja files built by gn
