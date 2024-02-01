@@ -70,7 +70,6 @@ public class EvalVisitor extends LabeledExprBaseVisitor<Integer> {
 	 */
 	@Override 
         public Integer visitParens(LabeledExprParser.ParensContext ctx) { 
-            return visitChildren(ctx);      // return chld expr's value
+            return visit(ctx.expr());      // return chld expr's value
         }
-
 }
