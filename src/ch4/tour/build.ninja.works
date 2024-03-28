@@ -2,7 +2,7 @@
 # Variables
 #
 outdir = out
-srcdir = starter
+srcdir = antlr
 
 # github codespace
 #CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
@@ -21,32 +21,47 @@ grun = java org.antlr.v4.runtime.misc.TestRig
 
 
 # rule to transform *.g4 files into *java, *.interp and *.tokens files
+# $in comes from the build statement which uses this rule.
 rule antlr_r
   command = $antlr4 $in
 
 # Build statement
 # Note the use of dollar sign to escape new lines and variables.
+# this one makes the java files based upon the grammar antlr/Expr.g4
+# 
+# input: 
+#   Expr.g4
+# output: 
+#   Expr.interp
+#   Expr.tokens
+#   ExprBaseListener.java
+#   ExprLexer.interp
+#   ExprLexer.java
+#   ExprLexer.tokens
+#   ExprListener.java
+#   ExprParser.java
+#
 build $
-$outdir/$srcdir/ArrayInit.tokens $
-$outdir/$srcdir/ArrayInitLexer.tokens $
-$outdir/$srcdir/ArrayInit.interp $
-$outdir/$srcdir/ArrayInitLexer.interp $
-$outdir/$srcdir/ArrayInitBaseListener.java $
-$outdir/$srcdir/ArrayInitLexer.java $
-$outdir/$srcdir/ArrayInitListener.java $
-$outdir/$srcdir/ArrayInitParser.java $
+$outdir/$srcdir/Expr.interp $
+$outdir/$srcdir/Expr.tokens $
+$outdir/$srcdir/ExprBaseListener.java $
+$outdir/$srcdir/ExprLexer.interp $
+$outdir/$srcdir/ExprLexer.java $
+$outdir/$srcdir/ExprLexer.tokens $
+$outdir/$srcdir/ExprListener.java $
+$outdir/$srcdir/ExprParser.java $
 $outdir/$srcdir $
-: antlr_r $srcdir/ArrayInit.g4
+: antlr_r $srcdir/Expr.g4
 
 
 # rule to compile java code
-rule jc
-  command = javac -d $outdir --class-path $CLASSPATH $in
-  description = javac $outdir
+#rule jc
+#  command = javac -d $outdir --class-path $CLASSPATH $in
+#  description = javac $outdir
 
 # depends upon nothing. Makes class
 # * ArrayInitLexer
-build $outdir/ArrayInitLexer.class: jc $outdir/$srcdir/ArrayInitLexer.java
+#build $outdir/ArrayInitLexer.class: jc $outdir/$srcdir/ArrayInitLexer.java
 
 # depends upon nothing. Makes class files:
 # * ArrayInitBaseListener
@@ -54,21 +69,21 @@ build $outdir/ArrayInitLexer.class: jc $outdir/$srcdir/ArrayInitLexer.java
 # * ArrayInitParser
 # * ArrayInitParser$InitContext
 # * ArrayInitParser$ValueContext
-build $outdir/ArrayInitParser$$InitContext.class $outdir/ArrayInitParser$$ValueContext.class $outdir/ArrayInitBaseListener.class: jc $outdir/$srcdir/ArrayInitBaseListener.java
+#build $outdir/ArrayInitParser$$InitContext.class $outdir/ArrayInitParser$$ValueContext.class $outdir/ArrayInitBaseListener.class: jc $outdir/$srcdir/ArrayInitBaseListener.java
 
 # depends upon nothing. Makes class files:
 # * ArrayInitListener
 # * ArrayInitParser
 # * ArrayInitParser$InitContext
 # * ArrayInitParser$ValueContext
-build $outdir/ArrayInitListener.class: jc $outdir/$srcdir/ArrayInitListener.java
+#build $outdir/ArrayInitListener.class: jc $outdir/$srcdir/ArrayInitListener.java
 
 # depends upon nothing.  Makes class files:
 # * ArrayInitListener
 # * ArrayInitParser
 # * ArrayInitParser$InitContext
 # * ArrayInitParser$ValueContext
-build $outdir/ArrayInitParser.class: jc $outdir/$srcdir/ArrayInitParser.java
+#build $outdir/ArrayInitParser.class: jc $outdir/$srcdir/ArrayInitParser.java
 
 
 
@@ -76,9 +91,9 @@ build $outdir/ArrayInitParser.class: jc $outdir/$srcdir/ArrayInitParser.java
 # Testing
 #
 
-rule testit
-  command = cd $outdir; echo {1, 2, 3} | $grun ArrayInit init -tokens 
-  description = Testing the tokenizer
+#rule testit
+#  command = cd $outdir; echo {1, 2, 3} | $grun ArrayInit init -tokens 
+#  description = Testing the tokenizer
 
 # he does not generate outdir
-build $outdir do_testit: testit $outdir/ArrayInitParser$$InitContext.class
+#build $outdir do_testit: testit $outdir/ArrayInitParser$$InitContext.class

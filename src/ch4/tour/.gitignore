@@ -1,0 +1,6 @@
+out
+__pycache__
+antlr/*.java
+antlr/*.interp
+antlr/*.tokens
+antlr/.antlr/*
