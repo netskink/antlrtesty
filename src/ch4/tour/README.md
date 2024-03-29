@@ -3,11 +3,24 @@
 
 ## tour
 
-### Build
+![img](./imgs/uml.png)
+
+### Build 
+
+#### build using book
 
 ```
 $ antlr4 Expr.g4
 ```
+
+#### build using ninja
+
+```
+$ ninja
+or
+$ ninja -t clean
+```
+
 
 ### Test
 
@@ -16,15 +29,8 @@ $ antlr4 Expr.g4
 
 ```
 $ grun Expr prog -gui t.expr
+or
+$ ninja
 ```
 
 
-### Custom test program
-
-This code shows how to construct all the necessary components to parse
-the sample script similar to using grun
-
-```
-$ javac ExprJoyRide.java Expr.java
-$ java ExprJoyRide t.expr
-```

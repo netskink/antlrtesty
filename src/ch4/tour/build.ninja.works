@@ -26,8 +26,8 @@ rule antlr_r
   command = $antlr4 $in
 
 # Build statement
+# Makes files from the g4 files using the antlr rule.
 # Note the use of dollar sign to escape new lines and variables.
-# this one makes the java files based upon the grammar antlr/Expr.g4
 # 
 # input: 
 #   Expr.g4
@@ -54,36 +54,52 @@ $outdir/$srcdir $
 : antlr_r $srcdir/Expr.g4
 
 
+#
 # rule to compile java code
-#rule jc
-#  command = javac -d $outdir --class-path $CLASSPATH $in
-#  description = javac $outdir
+#
+rule jc
+  command = javac -d $outdir --class-path $CLASSPATH $in
+  description = javac $outdir
 
-# depends upon nothing. Makes class
-# * ArrayInitLexer
-#build $outdir/ArrayInitLexer.class: jc $outdir/$srcdir/ArrayInitLexer.java
 
-# depends upon nothing. Makes class files:
-# * ArrayInitBaseListener
-# * ArrayInitListener
-# * ArrayInitParser
-# * ArrayInitParser$InitContext
-# * ArrayInitParser$ValueContext
-#build $outdir/ArrayInitParser$$InitContext.class $outdir/ArrayInitParser$$ValueContext.class $outdir/ArrayInitBaseListener.class: jc $outdir/$srcdir/ArrayInitBaseListener.java
+#
+# depends upon ExprLexer.java. 
+# Makes single class.
+#
+build $
+$outdir/ExprLexer.class $
+: jc $outdir/$srcdir/ExprLexer.java
 
-# depends upon nothing. Makes class files:
-# * ArrayInitListener
-# * ArrayInitParser
-# * ArrayInitParser$InitContext
-# * ArrayInitParser$ValueContext
-#build $outdir/ArrayInitListener.class: jc $outdir/$srcdir/ArrayInitListener.java
+#
+# depends upon ExprParser.java. 
+# Makes:
+# ExprListener.class
+# ExprParser.class
+# ExprParser$$ExprContext.class
+# ExprParser$$ProgContext.class
+# ExprParser$$StatContext.class
+#
+build $
+$outdir/ExprParser.class $
+$outdir/ExprListener.class $
+$outdir/ExprParser$$ExprContext.class $
+$outdir/ExprParser$$ProgContext.class $
+$outdir/ExprParser$$StatContext.class $
+: jc $outdir/$srcdir/ExprParser.java
 
-# depends upon nothing.  Makes class files:
-# * ArrayInitListener
-# * ArrayInitParser
-# * ArrayInitParser$InitContext
-# * ArrayInitParser$ValueContext
-#build $outdir/ArrayInitParser.class: jc $outdir/$srcdir/ArrayInitParser.java
+
+#
+# depends upon ExprBaseListener.java and ExprListener.java. 
+# Makes multiple classes
+#
+#$outdir/ExprListener.class $
+#$outdir/ExprParser.class $
+#$outdir/ExprParser$$ExprContext.class $
+#$outdir/ExprParser$$ProgContext.class $
+#$outdir/ExprParser$$StatContext.class $
+build $
+$outdir/ExprBaseListener.class $
+: jc $outdir/$srcdir/ExprBaseListener.java
 
 
 
@@ -91,9 +107,14 @@ $outdir/$srcdir $
 # Testing
 #
 
-#rule testit
-#  command = cd $outdir; echo {1, 2, 3} | $grun ArrayInit init -tokens 
-#  description = Testing the tokenizer
 
-# he does not generate outdir
-#build $outdir do_testit: testit $outdir/ArrayInitParser$$InitContext.class
+rule parseTree
+  command = cd $outdir; $grun Expr prog -gui ../t.expr
+  description = launches org.antlr.v4.runtime.misc.TestRig
+
+build $
+$outdir $
+: parseTree $outdir/ExprParser.class
+
+
+
