@@ -2,12 +2,14 @@
 
 This is an improvement in that it breaks up the grammar into
 
-* parser
 * lexer grammer
     - contains the bits to identify the lowest level tokens
+* parser
+    - checks syntax
 
+## tour2
 
-## tour
+My version of this code renames some of the portions?
 
 ### Build
 

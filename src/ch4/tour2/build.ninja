@@ -5,6 +5,10 @@ outdir = out
 srcdir = antlr
 
 #
+# NOTE: the use of $outdir in the classpath.  This is so that when the 
+# testcode is built, it can reference the .class files built earlier.
+#
+#
 # github codespace
 #CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
 # macos terminal
@@ -28,31 +32,42 @@ rule antlr_r
 
 # Build statement
 # Makes files from the g4 files using the antlr rule.
-# Note the use of dollar sign to escape new lines and variables.
+# NOTE: the use of dollar sign to escape new lines and variables.
+# NOTE: run antlr on LibExpr.g4 only. It includes CommonLexerRules.g4
+# NOTE: the result is the similar to the tour example.  The difference
+#       is that all the filenames have a Lib prefix.  This comes from 
+#       the grammar name in LibExpr.g4
+# NOTE: the order of outputs to left of colon seem to matter.  The
+#       clean target will not work if the outdir/srcdir is first in the
+#       list of outputs, but will work if its the last one.
 # 
 # input: 
-#   Expr.g4
+#   LibExpr.g4
+#   CommonLexerRules.g4
 # output: 
-#   Expr.interp
-#   Expr.tokens
-#   ExprBaseListener.java
-#   ExprLexer.interp
-#   ExprLexer.java
-#   ExprLexer.tokens
-#   ExprListener.java
-#   ExprParser.java
+#   $outdir/$srcdir : need a phony output or an actual path at minimum.
+#   LibExpr.interp
+#   LibExpr.tokens
+#   LibExprBaseListener.java
+#   LibExprLexer.interp
+#   LibExprLexer.java
+#   LibExprLexer.tokens
+#   LibExprListener.java
+#   LibExprParser.java
 #
 build $
-$outdir/$srcdir/Expr.interp $
-$outdir/$srcdir/Expr.tokens $
-$outdir/$srcdir/ExprBaseListener.java $
-$outdir/$srcdir/ExprLexer.interp $
-$outdir/$srcdir/ExprLexer.java $
-$outdir/$srcdir/ExprLexer.tokens $
-$outdir/$srcdir/ExprListener.java $
-$outdir/$srcdir/ExprParser.java $
+$outdir/$srcdir/LibExpr.interp $
+$outdir/$srcdir/LibExpr.tokens $
+$outdir/$srcdir/LibExprBaseListener.java $
+$outdir/$srcdir/LibExprLexer.interp $
+$outdir/$srcdir/LibExprLexer.java $
+$outdir/$srcdir/LibExprLexer.tokens $
+$outdir/$srcdir/LibExprListener.java $
+$outdir/$srcdir/LibExprParser.java $
 $outdir/$srcdir $
-: antlr_r $srcdir/Expr.g4
+: antlr_r $srcdir/LibExpr.g4
+
+#$outdir $
 
 
 #
@@ -64,43 +79,49 @@ rule jc
 
 
 #
-# depends upon ExprLexer.java. 
+# depends upon LibExprLexer.java. 
 # Makes single class.
 #
 build $
-$outdir/ExprLexer.class $
-: jc $outdir/$srcdir/ExprLexer.java
+$outdir/LibExprLexer.class $
+: jc $outdir/$srcdir/LibExprLexer.java
 
 #
-# depends upon ExprParser.java. 
+# depends upon LibExprParser.java. 
 # Makes:
-# ExprListener.class
-# ExprParser.class
-# ExprParser$$ExprContext.class
-# ExprParser$$ProgContext.class
-# ExprParser$$StatContext.class
+#   LibExprListener.class
+#   LibExprParser.class
+#   LibExprParser$$ExprContext.class
+#   LibExprParser$$ProgContext.class
+#   LibExprParser$$StatContext.class
+#
+# NOTE: I added a dependecny on the outdir but it
+#       did not help with the clean failing afterr
+#       I added this stanza.
 #
 build $
-$outdir/ExprParser.class $
-$outdir/ExprListener.class $
-$outdir/ExprParser$$ExprContext.class $
-$outdir/ExprParser$$ProgContext.class $
-$outdir/ExprParser$$StatContext.class $
-: jc $outdir/$srcdir/ExprParser.java
+$outdir/LibExprParser.class $
+$outdir/LibExprListener.class $
+$outdir/LibExprParser$$ExprContext.class $
+$outdir/LibExprParser$$ProgContext.class $
+$outdir/LibExprParser$$StatContext.class $
+: jc $outdir/$srcdir/LibExprParser.java $
+
+#| $outdir
 
 
 #
 # depends upon ExprBaseListener.java and ExprListener.java. 
 # Makes multiple classes
 #
-#$outdir/ExprListener.class $
-#$outdir/ExprParser.class $
-#$outdir/ExprParser$$ExprContext.class $
-#$outdir/ExprParser$$ProgContext.class $
-#$outdir/ExprParser$$StatContext.class $
+# $outdir/LibExprListener.class $
+# $outdir/LibExprParser.class $
+# $outdir/LibExprParser$$ExprContext.class $
+# $outdir/LibExprParser$$ProgContext.class $
+# $outdir/LibExprParser$$StatContext.class $
 build $
-$outdir/ExprBaseListener.class $
-: jc $outdir/$srcdir/ExprBaseListener.java
+$outdir/LibExprBaseListener.class $
+: jc $outdir/$srcdir/LibExprBaseListener.java
 
 
 
@@ -108,14 +129,55 @@ $outdir/ExprBaseListener.class $
 # Testing
 #
 
+#
+# Test with the test TestRig
+#
 
 rule parseTree
-  command = cd $outdir; $grun Expr prog -gui ../t.expr
+  command = cd $outdir; $grun LibExpr prog -gui ../t.expr
   description = launches org.antlr.v4.runtime.misc.TestRig
 
+# depends upon the outdir and the LibExprParser.class
 build $
-$outdir $
-: parseTree $outdir/ExprParser.class
+do_testparse $
+: parseTree $outdir/LibExprParser.class
 
 
+#
+# Test with the custom java source
+#
+
+
+
+# This is for building the test drive using the custom class
+#
+# depends upon ExprLexer.java/class. 
+# Makes single class: ExprJoyRide.class
+#
+# NOTE: the use of the pipe symbol to specify a dependency which needs
+# to be built first.
+#
+build $
+$outdir/ExprJoyRide.class $
+: jc test/ExprJoyRide.java $
+| $outdir/LibExprLexer.class
+
+
+#
+# Now the code to test it via running the custom test code
+#
+
+# RULE: for grun command line
+rule testit_r
+  command = java --class-path $CLASSPATH ExprJoyRide t.expr
+  description = Testing the code using custom test code
+
+# BUILD: depends upon the java test code being built
+# makes: outdir 
+# depends upon $outdir/ExprJoyRide.class
+# uses rule testit_r
+build $
+do_testit $
+: testit_r $
+| $outdir/ExprJoyRide.class
 

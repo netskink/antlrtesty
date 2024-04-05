@@ -16,6 +16,11 @@ These are the exercises from ch 4.
 * calc - section 4.2 building a calculator using a Visitor
 * interface - section 4.3 building a translator with a Listener
 
+# URLS
+
+* [ninja manual](https://ninja-build.org/manual.html#_comparison_to_make)
+* [ninja guide](https://spectra.mathpix.com/article/2024.01.00364/a-complete-guide-to-the-ninja-build-system)
+
 # usage
 
 Replace ch4/tour with whatever you wish: tour, tour2, ...
