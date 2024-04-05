@@ -6,6 +6,7 @@
 ![img](./imgs/uml.png)
 
 * [lucid uml url](https://www.youtube.com/watch?v=UI6lqHOVHic)
+* [all antrl classes](https://www.antlr.org/api/Java/allclasses.html)
 * abstract classes are show either in Italics or `<<abstract class>>`
 * public attribute or method shown with `+`
 * private shown with `-`
@@ -60,4 +61,6 @@ or
 $ ninja
 ```
 
+This example uses the test rig to test the parser first.  Afterwards,
+it uses a custom java program ExprJoyRide.java to exercise the grammar.
 

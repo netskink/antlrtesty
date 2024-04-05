@@ -4,6 +4,11 @@
 outdir = out
 srcdir = antlr
 
+#
+# NOTE: the use of $outdir in the classpath.  This is so that when the 
+# testcode is built, it can reference the .class files built earlier.
+#
+#
 # github codespace
 #CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
 # macos terminal
@@ -107,14 +112,55 @@ $outdir/ExprBaseListener.class $
 # Testing
 #
 
+#
+# Test with the test TestRig
+#
 
 rule parseTree
   command = cd $outdir; $grun Expr prog -gui ../t.expr
   description = launches org.antlr.v4.runtime.misc.TestRig
 
+# depends upon the outdir and the ExprParser.class
 build $
-$outdir $
+do_testparse $
 : parseTree $outdir/ExprParser.class
 
 
+#
+# Test with the custom java source
+#
+
+
+
+# This is for building the test drive using the custom class
+#
+# depends upon ExprLexer.java/class. 
+# Makes single class: ExprJoyRide.class
+#
+# NOTE: the use of the pipe symbol to specify a dependency which needs
+# to be built first.
+#
+build $
+$outdir/ExprJoyRide.class $
+: jc test/ExprJoyRide.java $
+| $outdir/ExprLexer.class
+
+
+#
+# Now the code to test it via running the custom test code
+#
+
+# RULE: for grun command line
+rule testit_r
+  command = java --class-path $CLASSPATH ExprJoyRide t.expr
+  description = Testing the code using custom test code
+
+# BUILD: depends upon the java test code being built
+# makes: outdir 
+# depends upon $outdir/ExprJoyRide.class
+# uses rule testit_r
+build $
+do_testit $
+: testit_r $
+| $outdir/ExprJoyRide.class
 
