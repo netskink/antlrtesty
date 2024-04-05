@@ -1,0 +1,121 @@
+#
+# Variables
+#
+outdir = out
+srcdir = antlr
+
+#
+# github codespace
+#CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
+# macos terminal
+CLASSPATH = .:/Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
+
+# ninja does not respect shell aliases
+# github code space
+#antlr4 = java -jar /workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar -o $outdir
+# macos terminal
+antlr4 = java -jar /Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar -o $outdir
+
+# grun
+grun = java org.antlr.v4.runtime.misc.TestRig
+
+
+
+# rule to transform *.g4 files into *java, *.interp and *.tokens files
+# $in comes from the build statement which uses this rule.
+rule antlr_r
+  command = $antlr4 $in
+
+# Build statement
+# Makes files from the g4 files using the antlr rule.
+# Note the use of dollar sign to escape new lines and variables.
+# 
+# input: 
+#   Expr.g4
+# output: 
+#   Expr.interp
+#   Expr.tokens
+#   ExprBaseListener.java
+#   ExprLexer.interp
+#   ExprLexer.java
+#   ExprLexer.tokens
+#   ExprListener.java
+#   ExprParser.java
+#
+build $
+$outdir/$srcdir/Expr.interp $
+$outdir/$srcdir/Expr.tokens $
+$outdir/$srcdir/ExprBaseListener.java $
+$outdir/$srcdir/ExprLexer.interp $
+$outdir/$srcdir/ExprLexer.java $
+$outdir/$srcdir/ExprLexer.tokens $
+$outdir/$srcdir/ExprListener.java $
+$outdir/$srcdir/ExprParser.java $
+$outdir/$srcdir $
+: antlr_r $srcdir/Expr.g4
+
+
+#
+# rule to compile java code
+#
+rule jc
+  command = javac -d $outdir --class-path $CLASSPATH $in
+  description = javac $outdir
+
+
+#
+# depends upon ExprLexer.java. 
+# Makes single class.
+#
+build $
+$outdir/ExprLexer.class $
+: jc $outdir/$srcdir/ExprLexer.java
+
+#
+# depends upon ExprParser.java. 
+# Makes:
+# ExprListener.class
+# ExprParser.class
+# ExprParser$$ExprContext.class
+# ExprParser$$ProgContext.class
+# ExprParser$$StatContext.class
+#
+build $
+$outdir/ExprParser.class $
+$outdir/ExprListener.class $
+$outdir/ExprParser$$ExprContext.class $
+$outdir/ExprParser$$ProgContext.class $
+$outdir/ExprParser$$StatContext.class $
+: jc $outdir/$srcdir/ExprParser.java
+
+
+#
+# depends upon ExprBaseListener.java and ExprListener.java. 
+# Makes multiple classes
+#
+#$outdir/ExprListener.class $
+#$outdir/ExprParser.class $
+#$outdir/ExprParser$$ExprContext.class $
+#$outdir/ExprParser$$ProgContext.class $
+#$outdir/ExprParser$$StatContext.class $
+build $
+$outdir/ExprBaseListener.class $
+: jc $outdir/$srcdir/ExprBaseListener.java
+
+
+
+#
+# Testing
+#
+
+
+rule parseTree
+  command = cd $outdir; $grun Expr prog -gui ../t.expr
+  description = launches org.antlr.v4.runtime.misc.TestRig
+
+build $
+$outdir $
+: parseTree $outdir/ExprParser.class
+
+
+

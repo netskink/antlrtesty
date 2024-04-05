@@ -2,10 +2,6 @@ out
 __pycache__
 starter/
 starter/*
-tour/*.java
-tour/*.interp
-tour/*.tokens
-tour/.antlr/*
 tour2/*.java
 tour2/*.interp
 tour2/*.tokens

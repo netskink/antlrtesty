@@ -5,12 +5,17 @@
 # for finder
 .DS_Store
 
+
+
+# It turns out gn does not do Java.  Need to remove these settings
+#
+#
 # This is git repo for the gn source code
 gn/
 # any ninja files built by gn
 .ninja_deps
 .ninja_log
-*.ninja
+#*.ninja
 
 # This is the example code for the antlr4 book
 #book/
