@@ -1,0 +1,296 @@
+#
+# Variables
+#
+outdir = out
+srcdir = antlr
+
+#
+# NOTE: the use of $outdir in the classpath.  This is so that when the 
+# testcode is built, it can reference the .class files built earlier.
+#
+#
+# github codespace
+#CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
+# macos terminal
+CLASSPATH = .:/Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
+
+# ninja does not respect shell aliases
+# github code space
+#antlr4 = java -jar /workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar -o $outdir
+# macos terminal
+antlr4 = java -jar /Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar -o $outdir
+
+# grun
+grun = java org.antlr.v4.runtime.misc.TestRig
+
+
+
+# rule to transform *.g4 files into *java, *.interp and *.tokens files
+# $in comes from the build statement which uses this rule.
+rule antlr_r
+  command = $antlr4 $in
+
+# Build statement
+# Makes files from the g4 files using the antlr rule.
+# NOTE: the use of dollar sign to escape new lines and variables.
+# NOTE: run antlr on LabeledExpr.g4 only. It includes CommonLexerRules.g4
+# NOTE: the result is the similar to the tour example.  The difference
+#       is that all the filenames have a Labeled prefix.  This comes from 
+#       the grammar name in LabeledExpr.g4
+# NOTE: the order of outputs to left of colon seem to matter.  The
+#       clean target will not work if the outdir/srcdir is first in the
+#       list of outputs, but will work if its the last one.
+# NOTE: the use of the `^` symbol below specifies that the directory
+#       must be created first.  That seems to fix the problem above
+#       where the order determines if clean will work or not.
+# NOTE: Hmm.  The ^ symbol did not resolve my error.  Perhaps no way
+#       To get it to clean the top-level output directory.
+# 
+# input: 
+#   LabeledExpr.g4
+#   CommonLexerRules.g4
+# output: 
+#   $outdir/$srcdir : need a phony output or an actual path at minimum.
+#   $outdir/$srcdir/LabeledExpr.interp 
+#   $outdir/$srcdir/LabeledExpr.tokens 
+#   $outdir/$srcdir/LabeledExprBaseListener.java 
+#   $outdir/$srcdir/LabeledExprLexer.interp 
+#   $outdir/$srcdir/LabeledExprLexer.java 
+#   $outdir/$srcdir/LabeledExprLexer.tokens 
+#   $outdir/$srcdir/LabeledExprListener.java 
+#   $outdir/$srcdir/LabeledExprParser.java 
+#
+
+
+
+build $
+$outdir/$srcdir/LabeledExpr.interp $
+$outdir/$srcdir/LabeledExpr.tokens $
+$outdir/$srcdir/LabeledExprBaseListener.java $
+$outdir/$srcdir/LabeledExprLexer.interp $
+$outdir/$srcdir/LabeledExprLexer.java $
+$outdir/$srcdir/LabeledExprLexer.tokens $
+$outdir/$srcdir/LabeledExprListener.java $
+$outdir/$srcdir/LabeledExprParser.java $
+$outdir/$srcdir $
+: antlr_r $srcdir/LabeledExpr.g4
+
+#$outdir^ $
+
+
+
+#
+# rule to compile java code
+#
+rule jc
+  command = javac -d $outdir --class-path $CLASSPATH $in
+  description = javac $outdir
+
+
+#
+# depends upon LabeledExprLexer.java. 
+# Makes single class.
+#
+build $
+$outdir/LabeledExprLexer.class $
+: jc $outdir/$srcdir/LabeledExprLexer.java
+
+#
+# depends upon LabeledExprParser.java. 
+# Makes:
+#   LabeledExprListener.class
+#   LabeledExprParser.class
+#   LabeledExprParser$$ExprContext.class
+#   LabeledExprParser$$ProgContext.class
+#   LabeledExprParser$$StatContext.class
+#
+# NOTE: I added a dependecny on the outdir but it
+#       did not help with the clean failing afterr
+#       I added this stanza.
+#
+build $
+$outdir/LabeledExprParser.class $
+$outdir/LabeledExprListener.class $
+$outdir/LabeledExprParser$$ExprContext.class $
+$outdir/LabeledExprParser$$ProgContext.class $
+$outdir/LabeledExprParser$$StatContext.class $
+$outdir/LabeledExprParser$$AddSubContext.class $
+$outdir/LabeledExprParser$$AssignContext.class $
+$outdir/LabeledExprParser$$BlankContext.class $
+$outdir/LabeledExprParser$$IdContext.class $
+$outdir/LabeledExprParser$$IntContext.class $
+$outdir/LabeledExprParser$$MulDivContext.class $
+$outdir/LabeledExprParser$$ParensContext.class $
+$outdir/LabeledExprParser$$PrintExprContext.class $
+: jc $outdir/$srcdir/LabeledExprParser.java $
+
+
+
+#
+# depends upon ExprBaseListener.java and ExprListener.java. 
+# Makes multiple classes
+#
+build $
+$outdir/LabeledExprBaseListener.class $
+: jc $outdir/$srcdir/LabeledExprBaseListener.java
+
+
+
+#
+# Testing
+#
+
+# TEST 1
+#
+# Test with the test TestRig and t.expr
+#
+# NOTE: $ grun grammarName startRuleName
+#              LabeledExpr     prog
+#              see LabeledExpr.g4 where the grammar is named LabeledExpr
+#              and the first rule is called prog.
+
+#rule parseTree
+#  command = cd $outdir; $grun LabeledExpr prog -gui ../t.expr
+#  description = launches org.antlr.v4.runtime.misc.TestRig
+
+# depends upon the outdir and the LabeledExprParser.class
+#build $
+#do_testparse $
+#: parseTree $outdir/LabeledExprParser.class
+
+
+# TEST 2
+#
+# Test with the custom java source
+#
+
+
+# This is for building the test driver using the custom class
+#
+# depends upon ExprLexer.java/class. 
+# Makes single class: ExprJoyRide.class
+#
+# NOTE: the use of the pipe symbol to specify a dependency which needs
+# to be built first.
+#
+#build $
+#$outdir/ExprJoyRide.class $
+#: jc test/ExprJoyRide.java $
+#| $outdir/LabeledExprLexer.class
+
+
+#
+# Now the code to test it via running the custom test code
+#
+
+# RULE: for grun command line
+#rule testit_r
+#  command = java --class-path $CLASSPATH ExprJoyRide t.expr
+#  description = Testing the code using custom test code
+
+# BUILD: depends upon the java test code being built
+# makes: outdir 
+# depends upon $outdir/ExprJoyRide.class
+# uses rule testit_r
+#build $
+#do_testit $
+#: testit_r $
+#| $outdir/ExprJoyRide.class
+
+
+# TEST 3
+#
+# Test with interactive (type in 3+4 and ctrl-D)
+# using grun
+#
+
+# RULE: for grun command line
+#rule test3_r
+#  command = cd $outdir; echo "3+4" | $grun LabeledExpr prog -tree
+#  description = Testing via grun and a sample input 3+4
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/LabeledExprLexer.class
+# uses rule test3_r
+#
+# run via ninja do_test3
+#build $
+#do_test3 $
+#: test3_r $
+#| $outdir/LabeledExprLexer.class
+
+
+# TEST 4
+#
+# Test with interactive (type in 3+4 and ctrl-D)
+# using the custom test code
+#
+
+# RULE: for custom java source
+#rule test4_r
+#  command = echo "3+4" | java --class-path $CLASSPATH ExprJoyRide 
+#  description = Testing via custom java code and a sample input 3+4
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/ExprJoyRide.class
+# uses rule test4_r
+#
+# run via ninja do_test4
+#build $
+#do_test4 $
+#: test4_r $
+#| $outdir/ExprJoyRide.class
+
+# TEST 5
+#
+# Test with interactive code having errors
+# using the custom test code so that we can
+# see how it handles parse errors.
+#
+
+# RULE: for custom java source
+#rule test5_r
+#  command = echo "(1+2" | java --class-path $CLASSPATH ExprJoyRide 
+#  description = Testing via custom java code and improper input. Missing paren.
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/ExprJoyRide.class
+# uses rule test5_r
+#
+# run via ninja do_test5
+#build $
+#do_test5 $
+#: test5_r $
+#| $outdir/ExprJoyRide.class
+
+
+# TEST 6
+#
+# Test with interactive code having errors
+# using the grun so that we can
+# see how it handles parse errors.
+#
+
+# RULE: for grun command line
+#rule test6_r
+#  command = cd $outdir; echo "(1+2\n33*67" | $grun LabeledExpr prog -gui
+#  description = Testing via grun and improper input. Missing paren.
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/ExprJoyRide.class
+# uses rule test5_r
+#
+# run via ninja do_test5
+#build $
+#do_test6 $
+#: test6_r $
+#| $outdir/ExprJoyRide.class
+
+
+
+
+

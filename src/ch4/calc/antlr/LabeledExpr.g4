@@ -10,6 +10,11 @@ import CommonLexerRules;  // includes all rules from CommonLexerRules.g4
 
 
 /** The start rule; begin parsing here. */
+// NOTE: the `# text` in third column has a special
+// meaning to Antlr.  These called `labeled alternatives`.
+// Labels appear on the right edge of alternatives and start
+// with the # symbol.  They provide separate visitor methods
+// for each rule. 
 prog:         stat+ ;
 
 stat:         expr NEWLINE                 # printExpr

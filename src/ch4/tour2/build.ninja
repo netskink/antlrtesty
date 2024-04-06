@@ -67,7 +67,6 @@ $outdir/$srcdir/LibExprParser.java $
 $outdir/$srcdir $
 : antlr_r $srcdir/LibExpr.g4
 
-#$outdir $
 
 
 #
@@ -107,7 +106,6 @@ $outdir/LibExprParser$$ProgContext.class $
 $outdir/LibExprParser$$StatContext.class $
 : jc $outdir/$srcdir/LibExprParser.java $
 
-#| $outdir
 
 
 #
