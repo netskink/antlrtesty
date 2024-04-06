@@ -32,3 +32,21 @@ $ cd ..
 $ cd src/ch4/tour
 $ ninja
 ```
+
+## list available targets
+
+```
+$ ninja -t targets
+```
+
+## run a particular target
+
+```
+$ ninja do_test3
+```
+
+## clean all targets
+
+```
+$ ninja -t clean
+```

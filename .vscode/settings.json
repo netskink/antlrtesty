@@ -1,0 +1,12 @@
+{
+    "java.project.sourcePaths": [
+        "src/ch4/tour/out/antlr",
+        "src/ch4/tour/test",
+        "src/ch4/tour2",
+        "src/ch4/tour2/test",
+        "src/mygnjava2/tutorial"
+    ],
+    "java.project.referencedLibraries": [
+        "jars/antlr-4.13.1-complete.jar"
+    ]
+}

@@ -129,9 +129,14 @@ $outdir/LibExprBaseListener.class $
 # Testing
 #
 
+# TEST 1
 #
-# Test with the test TestRig
+# Test with the test TestRig and t.expr
 #
+# NOTE: $ grun grammarName startRuleName
+#              LibExpr     prog
+#              see LibExpr.g4 where the grammar is named LibExpr
+#              and the first rule is called prog.
 
 rule parseTree
   command = cd $outdir; $grun LibExpr prog -gui ../t.expr
@@ -143,13 +148,13 @@ do_testparse $
 : parseTree $outdir/LibExprParser.class
 
 
+# TEST 2
 #
 # Test with the custom java source
 #
 
 
-
-# This is for building the test drive using the custom class
+# This is for building the test driver using the custom class
 #
 # depends upon ExprLexer.java/class. 
 # Makes single class: ExprJoyRide.class
@@ -181,3 +186,95 @@ do_testit $
 : testit_r $
 | $outdir/ExprJoyRide.class
 
+
+# TEST 3
+#
+# Test with interactive (type in 3+4 and ctrl-D)
+# using grun
+#
+
+# RULE: for grun command line
+rule test3_r
+  command = cd $outdir; echo "3+4" | $grun LibExpr prog -tree
+  description = Testing via grun and a sample input 3+4
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/LibExprLexer.class
+# uses rule test3_r
+#
+# run via ninja do_test3
+build $
+do_test3 $
+: test3_r $
+| $outdir/LibExprLexer.class
+
+
+# TEST 4
+#
+# Test with interactive (type in 3+4 and ctrl-D)
+# using the custom test code
+#
+
+# RULE: for custom java source
+rule test4_r
+  command = echo "3+4" | java --class-path $CLASSPATH ExprJoyRide 
+  description = Testing via custom java code and a sample input 3+4
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/ExprJoyRide.class
+# uses rule test4_r
+#
+# run via ninja do_test4
+build $
+do_test4 $
+: test4_r $
+| $outdir/ExprJoyRide.class
+
+# TEST 5
+#
+# Test with interactive code having errors
+# using the custom test code so that we can
+# see how it handles parse errors.
+#
+
+# RULE: for custom java source
+rule test5_r
+  command = echo "(1+2" | java --class-path $CLASSPATH ExprJoyRide 
+  description = Testing via custom java code and improper input. Missing paren.
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/ExprJoyRide.class
+# uses rule test5_r
+#
+# run via ninja do_test5
+build $
+do_test5 $
+: test5_r $
+| $outdir/ExprJoyRide.class
+
+
+# TEST 6
+#
+# Test with interactive code having errors
+# using the grun so that we can
+# see how it handles parse errors.
+#
+
+# RULE: for grun command line
+rule test6_r
+  command = cd $outdir; echo "(1+2\n33*67" | $grun LibExpr prog -gui
+  description = Testing via grun and improper input. Missing paren.
+
+# BUILD: depends upon the java test code being built
+# makes: fake output
+# depends upon  $outdir/ExprJoyRide.class
+# uses rule test5_r
+#
+# run via ninja do_test5
+build $
+do_test6 $
+: test6_r $
+| $outdir/ExprJoyRide.class
