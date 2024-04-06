@@ -1,12 +1,3 @@
 out
 __pycache__
-starter/
-starter/*
-tour2/*.java
-tour2/*.interp
-tour2/*.tokens
-tour2/.antlr/*
-calc/*.java
-calc/*.interp
-calc/*.tokens
-calc/.antlr/*
+.antlr
