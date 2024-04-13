@@ -2,6 +2,7 @@
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
@@ -37,14 +38,12 @@ public class Calc {
         // Start prarsing - this is the same
         ParseTree tree = parser.prog(); // parse; start at prog
 
-        // This is new
+        // This code is different from the tour.  It is not
+        // shown on page 41 and instead is on page 42.  It uses
+        // the other source file in the test dir.
         EvalVisitor eval = new EvalVisitor();
         eval.visit(tree);
 
-
-        // This is no longer used.
-        // Print the resulting tree
-        //System.out.println(tree.toStringTree(parser));  // print tree as text
     }
 }
 

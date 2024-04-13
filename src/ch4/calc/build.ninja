@@ -2,7 +2,8 @@
 # Variables
 #
 outdir = out
-srcdir = antlr
+antlrdir = antlr
+testdir = test
 
 #
 # NOTE: the use of $outdir in the classpath.  This is so that when the 
@@ -10,9 +11,9 @@ srcdir = antlr
 #
 #
 # github codespace
-#CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
+#CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$antlrdir
 # macos terminal
-CLASSPATH = .:/Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
+CLASSPATH = .:/Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$antlrdir
 
 # ninja does not respect shell aliases
 # github code space
@@ -27,55 +28,42 @@ grun = java org.antlr.v4.runtime.misc.TestRig
 
 # rule to transform *.g4 files into *java, *.interp and *.tokens files
 # $in comes from the build statement which uses this rule.
+#
+# NOTE: This sample adds the --no-listener and -visitor switch.
+#       This fails to build the LabeledExprBaseListener.java
 rule antlr_r
-  command = $antlr4 $in
+  command = $antlr4 -no-listener -visitor $in
 
 # Build statement
 # Makes files from the g4 files using the antlr rule.
 # NOTE: the use of dollar sign to escape new lines and variables.
-# NOTE: run antlr on LabeledExpr.g4 only. It includes CommonLexerRules.g4
+# NOTE: run antlr on LibExpr.g4 only. It includes CommonLexerRules.g4
 # NOTE: the result is the similar to the tour example.  The difference
-#       is that all the filenames have a Labeled prefix.  This comes from 
-#       the grammar name in LabeledExpr.g4
+#       is that all the filenames have a Lib prefix.  This comes from 
+#       the grammar name in LibExpr.g4
 # NOTE: the order of outputs to left of colon seem to matter.  The
-#       clean target will not work if the outdir/srcdir is first in the
+#       clean target will not work if the outdir/antlrdir is first in the
 #       list of outputs, but will work if its the last one.
-# NOTE: the use of the `^` symbol below specifies that the directory
-#       must be created first.  That seems to fix the problem above
-#       where the order determines if clean will work or not.
-# NOTE: Hmm.  The ^ symbol did not resolve my error.  Perhaps no way
-#       To get it to clean the top-level output directory.
 # 
-# input: 
-#   LabeledExpr.g4
-#   CommonLexerRules.g4
-# output: 
-#   $outdir/$srcdir : need a phony output or an actual path at minimum.
-#   $outdir/$srcdir/LabeledExpr.interp 
-#   $outdir/$srcdir/LabeledExpr.tokens 
-#   $outdir/$srcdir/LabeledExprBaseListener.java 
-#   $outdir/$srcdir/LabeledExprLexer.interp 
-#   $outdir/$srcdir/LabeledExprLexer.java 
-#   $outdir/$srcdir/LabeledExprLexer.tokens 
-#   $outdir/$srcdir/LabeledExprListener.java 
-#   $outdir/$srcdir/LabeledExprParser.java 
 #
+# FILES NOT BUILT WHEN antlr4 -no-listener is specified
+#$outdir/$antlrdir/LabeledExprBaseListener.java $
+#$outdir/$antlrdir/LabeledExprListener.java $
+# instead it builds Visitor versions of these two files
 
 
 
 build $
-$outdir/$srcdir/LabeledExpr.interp $
-$outdir/$srcdir/LabeledExpr.tokens $
-$outdir/$srcdir/LabeledExprBaseListener.java $
-$outdir/$srcdir/LabeledExprLexer.interp $
-$outdir/$srcdir/LabeledExprLexer.java $
-$outdir/$srcdir/LabeledExprLexer.tokens $
-$outdir/$srcdir/LabeledExprListener.java $
-$outdir/$srcdir/LabeledExprParser.java $
-$outdir/$srcdir $
-: antlr_r $srcdir/LabeledExpr.g4
-
-#$outdir^ $
+$outdir/$antlrdir/LabeledExpr.interp $
+$outdir/$antlrdir/LabeledExpr.tokens $
+$outdir/$antlrdir/LabeledExprBaseVisitor.java $
+$outdir/$antlrdir/LabeledExprLexer.interp $
+$outdir/$antlrdir/LabeledExprLexer.java $
+$outdir/$antlrdir/LabeledExprLexer.tokens $
+$outdir/$antlrdir/LabeledExprVisitor.java $
+$outdir/$antlrdir/LabeledExprParser.java $
+$outdir/$antlrdir $
+: antlr_r $antlrdir/LabeledExpr.g4
 
 
 
@@ -88,51 +76,33 @@ rule jc
 
 
 #
-# depends upon LabeledExprLexer.java. 
+# depends upon LibExprLexer.java
 # Makes single class.
 #
 build $
 $outdir/LabeledExprLexer.class $
-: jc $outdir/$srcdir/LabeledExprLexer.java
+: jc $outdir/$antlrdir/LabeledExprLexer.java
 
 #
-# depends upon LabeledExprParser.java. 
-# Makes:
-#   LabeledExprListener.class
-#   LabeledExprParser.class
-#   LabeledExprParser$$ExprContext.class
-#   LabeledExprParser$$ProgContext.class
-#   LabeledExprParser$$StatContext.class
-#
-# NOTE: I added a dependecny on the outdir but it
-#       did not help with the clean failing afterr
-#       I added this stanza.
-#
+# depends upon LabeledExprParser.java
+# 
 build $
 $outdir/LabeledExprParser.class $
-$outdir/LabeledExprListener.class $
+$outdir/LabeledExprVisitor.class $
 $outdir/LabeledExprParser$$ExprContext.class $
 $outdir/LabeledExprParser$$ProgContext.class $
 $outdir/LabeledExprParser$$StatContext.class $
-$outdir/LabeledExprParser$$AddSubContext.class $
-$outdir/LabeledExprParser$$AssignContext.class $
-$outdir/LabeledExprParser$$BlankContext.class $
-$outdir/LabeledExprParser$$IdContext.class $
-$outdir/LabeledExprParser$$IntContext.class $
-$outdir/LabeledExprParser$$MulDivContext.class $
-$outdir/LabeledExprParser$$ParensContext.class $
-$outdir/LabeledExprParser$$PrintExprContext.class $
-: jc $outdir/$srcdir/LabeledExprParser.java $
+: jc $outdir/$antlrdir/LabeledExprParser.java $
 
 
 
 #
-# depends upon ExprBaseListener.java and ExprListener.java. 
+# depends upon LabeledExprBaseVisitor.java and LabeledExprVisitor.java. 
 # Makes multiple classes
 #
 build $
-$outdir/LabeledExprBaseListener.class $
-: jc $outdir/$srcdir/LabeledExprBaseListener.java
+$outdir/LabeledExprBaseVisitor.class $
+: jc $outdir/$antlrdir/LabeledExprBaseVisitor.java
 
 
 
@@ -145,18 +115,18 @@ $outdir/LabeledExprBaseListener.class $
 # Test with the test TestRig and t.expr
 #
 # NOTE: $ grun grammarName startRuleName
-#              LabeledExpr     prog
-#              see LabeledExpr.g4 where the grammar is named LabeledExpr
+#              LibExpr     prog
+#              see LibExpr.g4 where the grammar is named LibExpr
 #              and the first rule is called prog.
 
 #rule parseTree
-#  command = cd $outdir; $grun LabeledExpr prog -gui ../t.expr
+#  command = cd $outdir; $grun LibExpr prog -gui ../t.expr
 #  description = launches org.antlr.v4.runtime.misc.TestRig
 
-# depends upon the outdir and the LabeledExprParser.class
+# depends upon the outdir and the LibExprParser.class
 #build $
 #do_testparse $
-#: parseTree $outdir/LabeledExprParser.class
+#: parseTree $outdir/LibExprParser.class
 
 
 # TEST 2
@@ -173,10 +143,11 @@ $outdir/LabeledExprBaseListener.class $
 # NOTE: the use of the pipe symbol to specify a dependency which needs
 # to be built first.
 #
-#build $
-#$outdir/ExprJoyRide.class $
-#: jc test/ExprJoyRide.java $
-#| $outdir/LabeledExprLexer.class
+build $
+$outdir/Calc.class $
+$outdir/EvalVisitor.class $
+: jc $testdir/Calc.java $testdir/EvalVisitor.java $
+| $outdir/LabeledExprLexer.class
 
 
 #
@@ -184,18 +155,18 @@ $outdir/LabeledExprBaseListener.class $
 #
 
 # RULE: for grun command line
-#rule testit_r
-#  command = java --class-path $CLASSPATH ExprJoyRide t.expr
-#  description = Testing the code using custom test code
+rule testit_r
+  command = java --class-path $CLASSPATH Calc t.expr
+  description = Testing the code using custom test code
 
 # BUILD: depends upon the java test code being built
 # makes: outdir 
 # depends upon $outdir/ExprJoyRide.class
 # uses rule testit_r
-#build $
-#do_testit $
-#: testit_r $
-#| $outdir/ExprJoyRide.class
+build $
+do_testit $
+: testit_r $
+| $outdir/Calc.class
 
 
 # TEST 3
@@ -206,19 +177,19 @@ $outdir/LabeledExprBaseListener.class $
 
 # RULE: for grun command line
 #rule test3_r
-#  command = cd $outdir; echo "3+4" | $grun LabeledExpr prog -tree
+#  command = cd $outdir; echo "3+4" | $grun LibExpr prog -tree
 #  description = Testing via grun and a sample input 3+4
 
 # BUILD: depends upon the java test code being built
 # makes: fake output
-# depends upon  $outdir/LabeledExprLexer.class
+# depends upon  $outdir/LibExprLexer.class
 # uses rule test3_r
 #
 # run via ninja do_test3
 #build $
 #do_test3 $
 #: test3_r $
-#| $outdir/LabeledExprLexer.class
+#| $outdir/LibExprLexer.class
 
 
 # TEST 4
@@ -276,7 +247,7 @@ $outdir/LabeledExprBaseListener.class $
 
 # RULE: for grun command line
 #rule test6_r
-#  command = cd $outdir; echo "(1+2\n33*67" | $grun LabeledExpr prog -gui
+#  command = cd $outdir; echo "(1+2\n33*67" | $grun LibExpr prog -gui
 #  description = Testing via grun and improper input. Missing paren.
 
 # BUILD: depends upon the java test code being built
@@ -289,8 +260,3 @@ $outdir/LabeledExprBaseListener.class $
 #do_test6 $
 #: test6_r $
 #| $outdir/ExprJoyRide.class
-
-
-
-
-

@@ -33,7 +33,7 @@ expr:         expr op=('*'|'/') expr       # MulDiv
 // This part defines token names for the operator literals
 // this allows us to use java constants in the visitor
 
-MUL:     '*' ;
+MUL:     '*' ;   // assign token name to '*' used above in grammar
 DIV:     '/' ;
 ADD:     '+' ;
 SUB:     '-' ;
