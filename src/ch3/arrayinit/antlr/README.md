@@ -76,13 +76,39 @@ $ javac *.java
 
 ### Run the test rig on the grammar
 
-The test rig takes a grammar name, a starting rule name (consider it similar to main() ) and various options.  In this
-case options to print the various tokens created during recognition.
+The test rig takes a grammar name, a starting rule name (consider it similar to main() ) and various options.  In this case options to print the various tokens created during recognition.
 
+
+The `r` says to start with rule r:
 
 ```
 $ grun Hello r -tokens
 ```
+
+For the ArrayInit grammer, this is how to test it: (note it starts with rule init)
+
+```
+$ grun ArrayInit init -tokens
+{1,{2,3},4}
+ctrl-d
+```
+
+To show the list text tree (root children):
+
+```
+$ grun ArrayInit init -tree
+{1,{2,3},4}
+ctrl-d
+```
+
+To show the GUI tree (root children):
+
+```
+$ grun ArrayInit init -gui
+{1,{2,3},4}
+ctrl-d
+```
+
 
 Use `ctrl-d` to exit.  Afterwards, the `recognizer` exercised by the test rig
 prints the list of recognized tokens.
