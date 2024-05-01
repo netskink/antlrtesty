@@ -126,37 +126,44 @@ $outdir/${grammar}Parser.class
 #
 
 
-# This is for building the test driver using the custom class
-#
-# depends upon ExprLexer.java/class. 
-# Makes single class: ExprJoyRide.class
-#
-# NOTE: the use of the pipe symbol to specify a dependency which needs
-# to be built first.
-#
-#build $
-#$outdir/ExprJoyRide.class $
-#: jc test/ExprJoyRide.java $
-#| $outdir/ArrayInitLexer.class
+build $
+$outdir/Test.class $
+: jc test/Test.java $
+| $outdir/${grammar}Lexer.class
+
+
+build $
+$outdir/Test2.class $
+: jc test/Test2.java $
+| $outdir/${grammar}Lexer.class
 
 
 #
 # Now the code to test it via running the custom test code
 #
+rule test2_r
+  command = echo "{1,{2,3},4}" | java --class-path $CLASSPATH Test 
+  description = Testing via custom java code and a sample input 
 
-# RULE: for grun command line
-#rule testit_r
-#  command = java --class-path $CLASSPATH ExprJoyRide t.expr
-#  description = Testing the code using custom test code
+rule test2b_r
+  command = echo "{1,{2,3},4}" | java --class-path $CLASSPATH Test2 
+  description = Testing via custom java code and a sample input 
+
+
 
 # BUILD: depends upon the java test code being built
-# makes: outdir 
-# depends upon $outdir/ExprJoyRide.class
-# uses rule testit_r
-#build $
-#do_testit $
-#: testit_r $
-#| $outdir/ExprJoyRide.class
+build $
+do_testit $
+: test2_r $
+| $outdir/Test.class
+
+
+# BUILD: depends upon the java test code being built
+build $
+do_testit2 $
+: test2b_r $
+| $outdir/Test2.class
+
 
 
 # TEST 3
