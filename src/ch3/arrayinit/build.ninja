@@ -3,6 +3,7 @@
 #
 outdir = out
 srcdir = antlr
+grammar = ArrayInit
 
 #
 # NOTE: the use of $outdir in the classpath.  This is so that when the 
@@ -27,47 +28,11 @@ grun = java org.antlr.v4.runtime.misc.TestRig
 
 # rule to transform *.g4 files into *java, *.interp and *.tokens files
 # $in comes from the build statement which uses this rule.
+#
+# rule to antlr a grammar (.g4) file
+#
 rule antlr_r
   command = $antlr4 $in
-
-# Build statement
-# Makes files from the g4 files using the antlr rule.
-# NOTE: the use of dollar sign to escape new lines and variables.
-# NOTE: run antlr on LibExpr.g4 only. It includes CommonLexerRules.g4
-# NOTE: the result is the similar to the tour example.  The difference
-#       is that all the filenames have a Lib prefix.  This comes from 
-#       the grammar name in LibExpr.g4
-# NOTE: the order of outputs to left of colon seem to matter.  The
-#       clean target will not work if the outdir/srcdir is first in the
-#       list of outputs, but will work if its the last one.
-# 
-# input: 
-#   LibExpr.g4
-#   CommonLexerRules.g4
-# output: 
-#   $outdir/$srcdir : need a phony output or an actual path at minimum.
-#   LibExpr.interp
-#   LibExpr.tokens
-#   LibExprBaseListener.java
-#   LibExprLexer.interp
-#   LibExprLexer.java
-#   LibExprLexer.tokens
-#   LibExprListener.java
-#   LibExprParser.java
-#
-build $
-$outdir/$srcdir/LibExpr.interp $
-$outdir/$srcdir/LibExpr.tokens $
-$outdir/$srcdir/LibExprBaseListener.java $
-$outdir/$srcdir/LibExprLexer.interp $
-$outdir/$srcdir/LibExprLexer.java $
-$outdir/$srcdir/LibExprLexer.tokens $
-$outdir/$srcdir/LibExprListener.java $
-$outdir/$srcdir/LibExprParser.java $
-$outdir/$srcdir $
-: antlr_r $srcdir/LibExpr.g4
-
-
 
 #
 # rule to compile java code
@@ -77,49 +42,61 @@ rule jc
   description = javac $outdir
 
 
+
 #
-# depends upon LibExprLexer.java. 
+# Build statement to make .java, .tokens and .interp files from .g4
+#
+build $
+$outdir/$srcdir/${grammar}BaseListener.java $
+$outdir/$srcdir/${grammar}Parser.java $
+$outdir/$srcdir/${grammar}Listener.java $
+$outdir/$srcdir/${grammar}Lexer.java $
+$outdir/$srcdir/${grammar}.interp $
+$outdir/$srcdir/${grammar}Lexer.interp $
+$outdir/$srcdir/${grammar}.tokens $
+$outdir/$srcdir/${grammar}Lexer.tokens $
+$outdir/$srcdir $
+: antlr_r $
+$srcdir/${grammar}.g4
+
+
+#
+# build rules to make the various java source files
+#
+
+
+#
 # Makes single class.
 #
 build $
-$outdir/LibExprLexer.class $
-: jc $outdir/$srcdir/LibExprLexer.java
+$outdir/${grammar}Lexer.class $
+: jc $
+$outdir/$srcdir/${grammar}Lexer.java
 
 #
-# depends upon LibExprParser.java. 
-# Makes:
-#   LibExprListener.class
-#   LibExprParser.class
-#   LibExprParser$$ExprContext.class
-#   LibExprParser$$ProgContext.class
-#   LibExprParser$$StatContext.class
-#
-# NOTE: I added a dependecny on the outdir but it
-#       did not help with the clean failing afterr
-#       I added this stanza.
+# Makes multiple classes pertaining to parser
 #
 build $
-$outdir/LibExprParser.class $
-$outdir/LibExprListener.class $
-$outdir/LibExprParser$$ExprContext.class $
-$outdir/LibExprParser$$ProgContext.class $
-$outdir/LibExprParser$$StatContext.class $
-: jc $outdir/$srcdir/LibExprParser.java $
+$outdir/${grammar}Parser.class $
+$outdir/${grammar}Listener.class $
+$outdir/${grammar}Parser$$InitContext.class $
+$outdir/${grammar}Parser$$ValueContext.class $
+$outdir/${grammar}Parser$$ExprContext.class $
+$outdir/${grammar}Parser$$ProgContext.class $
+$outdir/${grammar}Parser$$StatContext.class $
+: jc $
+$outdir/$srcdir/${grammar}Parser.java $
 
 
 
 #
-# depends upon ExprBaseListener.java and ExprListener.java. 
-# Makes multiple classes
+# Makes multiple classes pertaining to listener
 #
-# $outdir/LibExprListener.class $
-# $outdir/LibExprParser.class $
-# $outdir/LibExprParser$$ExprContext.class $
-# $outdir/LibExprParser$$ProgContext.class $
-# $outdir/LibExprParser$$StatContext.class $
+#
 build $
-$outdir/LibExprBaseListener.class $
-: jc $outdir/$srcdir/LibExprBaseListener.java
+$outdir/${grammar}BaseListener.class $
+: jc $
+$outdir/$srcdir/${grammar}BaseListener.java
 
 
 
@@ -131,19 +108,16 @@ $outdir/LibExprBaseListener.class $
 #
 # Test with the test TestRig and t.expr
 #
-# NOTE: $ grun grammarName startRuleName
-#              LibExpr     prog
-#              see LibExpr.g4 where the grammar is named LibExpr
-#              and the first rule is called prog.
 
-rule parseTree
-  command = cd $outdir; $grun LibExpr prog -gui ../t.expr
-  description = launches org.antlr.v4.runtime.misc.TestRig
+rule grun_tree_r
+  command = cd $outdir; $grun ${grammar} init -gui ../test/t.expr
+  description = launches org.antlr.v4.runtime.misc.TestRig on t.expr
 
-# depends upon the outdir and the LibExprParser.class
+# depends upon the outdir and the ArrayInitParser.class
 build $
 do_testparse $
-: parseTree $outdir/LibExprParser.class
+: grun_tree_r $
+$outdir/${grammar}Parser.class
 
 
 # TEST 2
@@ -160,10 +134,10 @@ do_testparse $
 # NOTE: the use of the pipe symbol to specify a dependency which needs
 # to be built first.
 #
-build $
-$outdir/ExprJoyRide.class $
-: jc test/ExprJoyRide.java $
-| $outdir/LibExprLexer.class
+#build $
+#$outdir/ExprJoyRide.class $
+#: jc test/ExprJoyRide.java $
+#| $outdir/ArrayInitLexer.class
 
 
 #
@@ -171,18 +145,18 @@ $outdir/ExprJoyRide.class $
 #
 
 # RULE: for grun command line
-rule testit_r
-  command = java --class-path $CLASSPATH ExprJoyRide t.expr
-  description = Testing the code using custom test code
+#rule testit_r
+#  command = java --class-path $CLASSPATH ExprJoyRide t.expr
+#  description = Testing the code using custom test code
 
 # BUILD: depends upon the java test code being built
 # makes: outdir 
 # depends upon $outdir/ExprJoyRide.class
 # uses rule testit_r
-build $
-do_testit $
-: testit_r $
-| $outdir/ExprJoyRide.class
+#build $
+#do_testit $
+#: testit_r $
+#| $outdir/ExprJoyRide.class
 
 
 # TEST 3
@@ -192,20 +166,20 @@ do_testit $
 #
 
 # RULE: for grun command line
-rule test3_r
-  command = cd $outdir; echo "3+4" | $grun LibExpr prog -tree
-  description = Testing via grun and a sample input 3+4
+#rule test3_r
+#  command = cd $outdir; echo "3+4" | $grun ArrayInit prog -tree
+#  description = Testing via grun and a sample input 3+4
 
 # BUILD: depends upon the java test code being built
 # makes: fake output
-# depends upon  $outdir/LibExprLexer.class
+# depends upon  $outdir/ArrayInitLexer.class
 # uses rule test3_r
 #
 # run via ninja do_test3
-build $
-do_test3 $
-: test3_r $
-| $outdir/LibExprLexer.class
+#build $
+#do_test3 $
+#: test3_r $
+#| $outdir/ArrayInitLexer.class
 
 
 # TEST 4
@@ -215,9 +189,9 @@ do_test3 $
 #
 
 # RULE: for custom java source
-rule test4_r
-  command = echo "3+4" | java --class-path $CLASSPATH ExprJoyRide 
-  description = Testing via custom java code and a sample input 3+4
+#rule test4_r
+#  command = echo "3+4" | java --class-path $CLASSPATH ExprJoyRide 
+#  description = Testing via custom java code and a sample input 3+4
 
 # BUILD: depends upon the java test code being built
 # makes: fake output
@@ -225,10 +199,10 @@ rule test4_r
 # uses rule test4_r
 #
 # run via ninja do_test4
-build $
-do_test4 $
-: test4_r $
-| $outdir/ExprJoyRide.class
+#build $
+#do_test4 $
+#: test4_r $
+#| $outdir/ExprJoyRide.class
 
 # TEST 5
 #
@@ -238,9 +212,9 @@ do_test4 $
 #
 
 # RULE: for custom java source
-rule test5_r
-  command = echo "(1+2" | java --class-path $CLASSPATH ExprJoyRide 
-  description = Testing via custom java code and improper input. Missing paren.
+#rule test5_r
+#  command = echo "(1+2" | java --class-path $CLASSPATH ExprJoyRide 
+#  description = Testing via custom java code and improper input. Missing paren.
 
 # BUILD: depends upon the java test code being built
 # makes: fake output
@@ -248,10 +222,10 @@ rule test5_r
 # uses rule test5_r
 #
 # run via ninja do_test5
-build $
-do_test5 $
-: test5_r $
-| $outdir/ExprJoyRide.class
+#build $
+#do_test5 $
+#: test5_r $
+#| $outdir/ExprJoyRide.class
 
 
 # TEST 6
@@ -262,9 +236,9 @@ do_test5 $
 #
 
 # RULE: for grun command line
-rule test6_r
-  command = cd $outdir; echo "(1+2\n33*67" | $grun LibExpr prog -gui
-  description = Testing via grun and improper input. Missing paren.
+#rule test6_r
+#  command = cd $outdir; echo "(1+2\n33*67" | $grun ArrayInit prog -gui
+#  description = Testing via grun and improper input. Missing paren.
 
 # BUILD: depends upon the java test code being built
 # makes: fake output
@@ -272,7 +246,7 @@ rule test6_r
 # uses rule test5_r
 #
 # run via ninja do_test5
-build $
-do_test6 $
-: test6_r $
-| $outdir/ExprJoyRide.class
+#build $
+#do_test6 $
+#: test6_r $
+#| $outdir/ExprJoyRide.class

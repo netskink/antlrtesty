@@ -1,4 +1,3 @@
-g
 
 /** Grammars always start with a grammar header.  This grammar
 is called ArrayInit and it must match the filename ArrayInit.g4 */
