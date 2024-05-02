@@ -1,6 +1,7 @@
 #
 # Variables
 #
+grammar = Java
 outdir = out
 antlrdir = antlr
 testdir = test
@@ -13,6 +14,7 @@ testdir = test
 # github codespace
 #CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$antlrdir
 # macos terminal
+# TODO: Do we need the $outdir/$antlrdir because no class files are there.
 CLASSPATH = .:/Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$antlrdir
 
 # ninja does not respect shell aliases
@@ -25,6 +27,9 @@ antlr4 = java -jar /Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-comple
 grun = java org.antlr.v4.runtime.misc.TestRig
 
 
+#
+# rules
+#
 
 # rule to transform *.g4 files into *java, *.interp and *.tokens files
 # $in comes from the build statement which uses this rule.
@@ -32,39 +37,8 @@ grun = java org.antlr.v4.runtime.misc.TestRig
 # NOTE: This sample adds the --no-listener and -visitor switch.
 #       This fails to build the LabeledExprBaseListener.java
 rule antlr_r
-  command = $antlr4 -no-listener -visitor $in
-
-# Build statement
-# Makes files from the g4 files using the antlr rule.
-# NOTE: the use of dollar sign to escape new lines and variables.
-# NOTE: run antlr on LibExpr.g4 only. It includes CommonLexerRules.g4
-# NOTE: the result is the similar to the tour example.  The difference
-#       is that all the filenames have a Lib prefix.  This comes from 
-#       the grammar name in LibExpr.g4
-# NOTE: the order of outputs to left of colon seem to matter.  The
-#       clean target will not work if the outdir/antlrdir is first in the
-#       list of outputs, but will work if its the last one.
-# 
-#
-# FILES NOT BUILT WHEN antlr4 -no-listener is specified
-#$outdir/$antlrdir/LabeledExprBaseListener.java $
-#$outdir/$antlrdir/LabeledExprListener.java $
-# instead it builds Visitor versions of these two files
-
-
-
-build $
-$outdir/$antlrdir/LabeledExpr.interp $
-$outdir/$antlrdir/LabeledExpr.tokens $
-$outdir/$antlrdir/LabeledExprBaseVisitor.java $
-$outdir/$antlrdir/LabeledExprLexer.interp $
-$outdir/$antlrdir/LabeledExprLexer.java $
-$outdir/$antlrdir/LabeledExprLexer.tokens $
-$outdir/$antlrdir/LabeledExprVisitor.java $
-$outdir/$antlrdir/LabeledExprParser.java $
-$outdir/$antlrdir $
-: antlr_r $antlrdir/LabeledExpr.g4
-
+  command = $antlr4  $in
+  description = Converts grammar .g4 file into java source files
 
 
 #
@@ -72,61 +46,179 @@ $outdir/$antlrdir $
 #
 rule jc
   command = javac -d $outdir --class-path $CLASSPATH $in
-  description = javac $outdir
+  description = compiles java and puts classes in the out dir
 
 
+
+# Build statements
+# 
 #
-# depends upon LibExprLexer.java
-# Makes single class.
+
+# build grammar
 #
 build $
-$outdir/LabeledExprLexer.class $
-: jc $outdir/$antlrdir/LabeledExprLexer.java
+$outdir/$antlrdir/${grammar}.interp $
+$outdir/$antlrdir/${grammar}Lexer.interp $
+$outdir/$antlrdir/${grammar}.tokens $
+$outdir/$antlrdir/${grammar}Lexer.tokens $
+$outdir/$antlrdir/${grammar}BaseListener.java $
+$outdir/$antlrdir/${grammar}Lexer.java $
+$outdir/$antlrdir/${grammar}Listener.java $
+$outdir/$antlrdir/${grammar}Parser.java $
+$outdir/$antlrdir $
+: antlr_r $antlrdir/${grammar}.g4
+
+
+
+
+
+# build ${grammar}Lexer.java
+#
+build $
+$outdir/${grammar}Lexer.class $
+: jc $
+$outdir/$antlrdir/${grammar}Lexer.java
 
 #
-# depends upon LabeledExprParser.java
+# build ${grammar}Parser.java and its derived classes
 # 
 build $
-$outdir/LabeledExprParser.class $
-$outdir/LabeledExprVisitor.class $
-$outdir/LabeledExprParser$$ExprContext.class $
-$outdir/LabeledExprParser$$ProgContext.class $
-$outdir/LabeledExprParser$$StatContext.class $
-: jc $outdir/$antlrdir/LabeledExprParser.java $
+$outdir/${grammar}Parser.class $
+$outdir/${grammar}Parser$$AnnotationConstantRestContext.class $
+$outdir/${grammar}Parser$$AnnotationContext.class $
+$outdir/${grammar}Parser$$AnnotationMethodOrConstantRestContext.class $
+$outdir/${grammar}Parser$$AnnotationMethodRestContext.class $
+$outdir/${grammar}Parser$$AnnotationNameContext.class $
+$outdir/${grammar}Parser$$AnnotationTypeBodyContext.class $
+$outdir/${grammar}Parser$$AnnotationTypeDeclarationContext.class $
+$outdir/${grammar}Parser$$AnnotationTypeElementDeclarationContext.class $
+$outdir/${grammar}Parser$$AnnotationTypeElementRestContext.class $
+$outdir/${grammar}Parser$$AnnotationsContext.class $
+$outdir/${grammar}Parser$$ArgumentsContext.class $
+$outdir/${grammar}Parser$$ArrayCreatorRestContext.class $
+$outdir/${grammar}Parser$$ArrayInitializerContext.class $
+$outdir/${grammar}Parser$$BlockContext.class $
+$outdir/${grammar}Parser$$BlockStatementContext.class $
+$outdir/${grammar}Parser$$BooleanLiteralContext.class $
+$outdir/${grammar}Parser$$CatchClauseContext.class $
+$outdir/${grammar}Parser$$CatchesContext.class $
+$outdir/${grammar}Parser$$ClassBodyContext.class $
+$outdir/${grammar}Parser$$ClassBodyDeclarationContext.class $
+$outdir/${grammar}Parser$$ClassCreatorRestContext.class $
+$outdir/${grammar}Parser$$ClassDeclarationContext.class $
+$outdir/${grammar}Parser$$ClassOrInterfaceModifierContext.class $
+$outdir/${grammar}Parser$$ClassOrInterfaceTypeContext.class $
+$outdir/${grammar}Parser$$CompilationUnitContext.class $
+$outdir/${grammar}Parser$$ConstantDeclaratorContext.class $
+$outdir/${grammar}Parser$$ConstantDeclaratorRestContext.class $
+$outdir/${grammar}Parser$$ConstantDeclaratorsRestContext.class $
+$outdir/${grammar}Parser$$ConstantExpressionContext.class $
+$outdir/${grammar}Parser$$ConstructorBodyContext.class $
+$outdir/${grammar}Parser$$ConstructorDeclarationContext.class $
+$outdir/${grammar}Parser$$CreatedNameContext.class $
+$outdir/${grammar}Parser$$CreatorContext.class $
+$outdir/${grammar}Parser$$DefaultValueContext.class $
+$outdir/${grammar}Parser$$ElementValueArrayInitializerContext.class $
+$outdir/${grammar}Parser$$ElementValueContext.class $
+$outdir/${grammar}Parser$$ElementValuePairContext.class $
+$outdir/${grammar}Parser$$ElementValuePairsContext.class $
+$outdir/${grammar}Parser$$EnhancedForControlContext.class $
+$outdir/${grammar}Parser$$EnumBodyContext.class $
+$outdir/${grammar}Parser$$EnumBodyDeclarationsContext.class $
+$outdir/${grammar}Parser$$EnumConstantContext.class $
+$outdir/${grammar}Parser$$EnumConstantNameContext.class $
+$outdir/${grammar}Parser$$EnumConstantsContext.class $
+$outdir/${grammar}Parser$$EnumDeclarationContext.class $
+$outdir/${grammar}Parser$$ExplicitConstructorInvocationContext.class $
+$outdir/${grammar}Parser$$ExplicitGenericInvocationContext.class $
+$outdir/${grammar}Parser$$ExpressionContext.class $
+$outdir/${grammar}Parser$$ExpressionListContext.class $
+$outdir/${grammar}Parser$$FieldDeclarationContext.class $
+$outdir/${grammar}Parser$$ForControlContext.class $
+$outdir/${grammar}Parser$$ForInitContext.class $
+$outdir/${grammar}Parser$$ForUpdateContext.class $
+$outdir/${grammar}Parser$$FormalParameterContext.class $
+$outdir/${grammar}Parser$$FormalParameterDeclsContext.class $
+$outdir/${grammar}Parser$$FormalParameterDeclsRestContext.class $
+$outdir/${grammar}Parser$$FormalParametersContext.class $
+$outdir/${grammar}Parser$$GenericMethodDeclarationContext.class $
+$outdir/${grammar}Parser$$ImportDeclarationContext.class $
+$outdir/${grammar}Parser$$InnerCreatorContext.class $
+$outdir/${grammar}Parser$$IntegerLiteralContext.class $
+$outdir/${grammar}Parser$$InterfaceBodyContext.class $
+$outdir/${grammar}Parser$$InterfaceBodyDeclarationContext.class $
+$outdir/${grammar}Parser$$InterfaceDeclarationContext.class $
+$outdir/${grammar}Parser$$InterfaceGenericMethodDeclContext.class $
+$outdir/${grammar}Parser$$InterfaceMemberDeclContext.class $
+$outdir/${grammar}Parser$$InterfaceMethodDeclaratorRestContext.class $
+$outdir/${grammar}Parser$$InterfaceMethodOrFieldDeclContext.class $
+$outdir/${grammar}Parser$$InterfaceMethodOrFieldRestContext.class $
+$outdir/${grammar}Parser$$LiteralContext.class $
+$outdir/${grammar}Parser$$LocalVariableDeclarationContext.class $
+$outdir/${grammar}Parser$$LocalVariableDeclarationStatementContext.class $
+$outdir/${grammar}Parser$$MemberContext.class $
+$outdir/${grammar}Parser$$MethodBodyContext.class $
+$outdir/${grammar}Parser$$MethodDeclarationContext.class $
+$outdir/${grammar}Parser$$MethodDeclarationRestContext.class $
+$outdir/${grammar}Parser$$ModifierContext.class $
+$outdir/${grammar}Parser$$ModifiersContext.class $
+$outdir/${grammar}Parser$$NonWildcardTypeArgumentsContext.class $
+$outdir/${grammar}Parser$$NormalInterfaceDeclarationContext.class $
+$outdir/${grammar}Parser$$PackageDeclarationContext.class $
+$outdir/${grammar}Parser$$PackageOrTypeNameContext.class $
+$outdir/${grammar}Parser$$ParExpressionContext.class $
+$outdir/${grammar}Parser$$PrimaryContext.class $
+$outdir/${grammar}Parser$$PrimitiveTypeContext.class $
+$outdir/${grammar}Parser$$QualifiedNameContext.class $
+$outdir/${grammar}Parser$$QualifiedNameListContext.class $
+$outdir/${grammar}Parser$$StatementContext.class $
+$outdir/${grammar}Parser$$StatementExpressionContext.class $
+$outdir/${grammar}Parser$$SwitchBlockContext.class $
+$outdir/${grammar}Parser$$SwitchBlockStatementGroupContext.class $
+$outdir/${grammar}Parser$$SwitchLabelContext.class $
+$outdir/${grammar}Parser$$TypeArgumentContext.class $
+$outdir/${grammar}Parser$$TypeArgumentsContext.class $
+$outdir/${grammar}Parser$$TypeBoundContext.class $
+$outdir/${grammar}Parser$$TypeContext.class $
+$outdir/${grammar}Parser$$TypeDeclarationContext.class $
+$outdir/${grammar}Parser$$TypeListContext.class $
+$outdir/${grammar}Parser$$TypeNameContext.class $
+$outdir/${grammar}Parser$$TypeParameterContext.class $
+$outdir/${grammar}Parser$$TypeParametersContext.class $
+$outdir/${grammar}Parser$$VariableDeclaratorContext.class $
+$outdir/${grammar}Parser$$VariableDeclaratorIdContext.class $
+$outdir/${grammar}Parser$$VariableDeclaratorsContext.class $
+$outdir/${grammar}Parser$$VariableInitializerContext.class $
+$outdir/${grammar}Parser$$VariableModifierContext.class $
+$outdir/${grammar}Parser$$VariableModifiersContext.class $
+$outdir/${grammar}Parser$$VoidInterfaceMethodDeclaratorRestContext.class $
+$outdir/${grammar}Parser$$VoidMethodDeclaratorRestContext.class $
+: jc $
+$outdir/$antlrdir/${grammar}Parser.java 
 
 
 
 #
-# depends upon LabeledExprBaseVisitor.java and LabeledExprVisitor.java. 
-# Makes multiple classes
+# Builds ${grammar}BaseListener.java
 #
 build $
-$outdir/LabeledExprBaseVisitor.class $
-: jc $outdir/$antlrdir/LabeledExprBaseVisitor.java
+$outdir/${grammar}BaseListener.class $
+: jc $
+$outdir/$antlrdir/${grammar}BaseListener.java
 
+#
+# Builds ${grammar}Parser.java
+#
+#build $
+#$outdir/${grammar}Parser.class $
+#: jc $
+#$outdir/$antlrdir/${grammar}Parser.java
 
 
 #
 # Testing
 #
 
-# TEST 1
-#
-# Test with the test TestRig and t.expr
-#
-# NOTE: $ grun grammarName startRuleName
-#              LibExpr     prog
-#              see LibExpr.g4 where the grammar is named LibExpr
-#              and the first rule is called prog.
-
-#rule parseTree
-#  command = cd $outdir; $grun LibExpr prog -gui ../t.expr
-#  description = launches org.antlr.v4.runtime.misc.TestRig
-
-# depends upon the outdir and the LibExprParser.class
-#build $
-#do_testparse $
-#: parseTree $outdir/LibExprParser.class
 
 
 # TEST 2
@@ -134,85 +226,47 @@ $outdir/LabeledExprBaseVisitor.class $
 # Test with the custom java source
 #
 
+#$testdir/ExtractInterfaceTool.java $testdir/ExtractInterfaceListener.java $
+#$outdir/ExtractInterfaceTool.class $
 
-# This is for building the test driver using the custom class
 #
-# depends upon ExprLexer.java/class. 
-# Makes single class: ExprJoyRide.class
-#
-# NOTE: the use of the pipe symbol to specify a dependency which needs
-# to be built first.
-#
+# build the ExtractInterfaceListener.java 
+# used by the ExtractInterfaceTool.java
 build $
-$outdir/Calc.class $
-$outdir/EvalVisitor.class $
-: jc $testdir/Calc.java $testdir/EvalVisitor.java $
-| $outdir/LabeledExprLexer.class
+$outdir/ExtractInterfaceListener.class $
+: jc $
+$testdir/ExtractInterfaceListener.java $
+| $outdir/${grammar}BaseListener.class
+
+#
+# build the ExtractInterfaceTool.java 
+# which contains the main()
+build $
+$outdir/ExtractInterfaceTool.class $
+: jc $
+$testdir/ExtractInterfaceTool.java $
+| $outdir/${grammar}Lexer.class $outdir/${grammar}Parser.class $outdir/ExtractInterfaceListener.class
+
+
 
 
 #
 # Now the code to test it via running the custom test code
 #
 
-# RULE: for grun command line
-rule testit_r
-  command = java --class-path $CLASSPATH Calc t.expr
-  description = Testing the code using custom test code
-
-# BUILD: depends upon the java test code being built
-# makes: outdir 
-# depends upon $outdir/ExprJoyRide.class
-# uses rule testit_r
-build $
-do_testit $
-: testit_r $
-| $outdir/Calc.class
-
-
-# TEST 3
-#
-# Test with interactive (type in 3+4 and ctrl-D)
-# using grun
-#
-
-# RULE: for grun command line
-#rule test3_r
-#  command = cd $outdir; echo "3+4" | $grun LibExpr prog -tree
-#  description = Testing via grun and a sample input 3+4
-
-# BUILD: depends upon the java test code being built
-# makes: fake output
-# depends upon  $outdir/LibExprLexer.class
-# uses rule test3_r
-#
-# run via ninja do_test3
-#build $
-#do_test3 $
-#: test3_r $
-#| $outdir/LibExprLexer.class
-
-
-# TEST 4
-#
-# Test with interactive (type in 3+4 and ctrl-D)
-# using the custom test code
-#
 
 # RULE: for custom java source
-#rule test4_r
-#  command = echo "3+4" | java --class-path $CLASSPATH ExprJoyRide 
-#  description = Testing via custom java code and a sample input 3+4
+rule test1_r
+  command = java --class-path $CLASSPATH ExtractInterfaceTool test/Demo.java
+  description = Testing via custom java code and a sample file
 
-# BUILD: depends upon the java test code being built
-# makes: fake output
-# depends upon  $outdir/ExprJoyRide.class
-# uses rule test4_r
+# BUILD: 
 #
 # run via ninja do_test4
-#build $
-#do_test4 $
-#: test4_r $
-#| $outdir/ExprJoyRide.class
+build $
+do_test1 $
+: test1_r $
+| $outdir/ExtractInterfaceTool.class
 
 # TEST 5
 #

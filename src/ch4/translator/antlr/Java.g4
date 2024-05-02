@@ -648,9 +648,10 @@ StringLiteral
     :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
     ;
 
+// orig    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
 fragment
 EscapeSequence
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\''|'\\')
     |   UnicodeEscape
     |   OctalEscape
     ;

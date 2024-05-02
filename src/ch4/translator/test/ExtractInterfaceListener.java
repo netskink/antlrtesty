@@ -12,7 +12,7 @@ public class ExtractInterfaceListener extends JavaBaseListener {
     /** Listen to matches of classDeclaration */
     @Override
     public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
-        System.out.println("interface I" + ctx.Identifer() + " {");
+        System.out.println("interface I" + ctx.Identifier() + " {");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class ExtractInterfaceListener extends JavaBaseListener {
 
     /** Listen to matches of methodDeclaration */
     @Override
-    public void enterMethodDeclaration(JavaParser.methodDeclarationContext ctx) {
+    public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
         // need parser to get tokens
         TokenStream tokens = parser.getTokenStream();
         String type = "void";
@@ -31,7 +31,7 @@ public class ExtractInterfaceListener extends JavaBaseListener {
         }
         String args = tokens.getText(ctx.formalParameters());
 
-        System.out.println("\t" + type + " " + ctx.Identifer() + args + ";");
+        System.out.println("\t" + type + " " + ctx.Identifier() + args + ";");
 
     }
 }
