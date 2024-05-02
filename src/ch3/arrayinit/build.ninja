@@ -152,6 +152,7 @@ rule test2b_r
 
 
 # BUILD: depends upon the java test code being built
+# does the execution
 build $
 do_testit $
 : test2_r $
@@ -159,6 +160,7 @@ do_testit $
 
 
 # BUILD: depends upon the java test code being built
+# does the execution
 build $
 do_testit2 $
 : test2b_r $
@@ -168,92 +170,27 @@ do_testit2 $
 
 # TEST 3
 #
-# Test with interactive (type in 3+4 and ctrl-D)
-# using grun
-#
+# test with translate.java and ShortToUnicodeString 
+# using walker capability
 
-# RULE: for grun command line
-#rule test3_r
-#  command = cd $outdir; echo "3+4" | $grun ArrayInit prog -tree
-#  description = Testing via grun and a sample input 3+4
+# build the two test java files
+build $
+$outdir/ShortToUnicodeString.class $
+: jc test/ShortToUnicodeString.java $
+| $outdir/${grammar}Lexer.class
 
-# BUILD: depends upon the java test code being built
-# makes: fake output
-# depends upon  $outdir/ArrayInitLexer.class
-# uses rule test3_r
-#
-# run via ninja do_test3
-#build $
-#do_test3 $
-#: test3_r $
-#| $outdir/ArrayInitLexer.class
+build $
+$outdir/Translate.class $
+: jc test/Translate.java $
+| $outdir/ShortToUnicodeString.class
 
+# rule to run test
+rule test3_r
+  command = echo "{1,2}" | java --class-path $CLASSPATH Translate
+  description = Testing via translate java code and a sample input 
 
-# TEST 4
-#
-# Test with interactive (type in 3+4 and ctrl-D)
-# using the custom test code
-#
-
-# RULE: for custom java source
-#rule test4_r
-#  command = echo "3+4" | java --class-path $CLASSPATH ExprJoyRide 
-#  description = Testing via custom java code and a sample input 3+4
-
-# BUILD: depends upon the java test code being built
-# makes: fake output
-# depends upon  $outdir/ExprJoyRide.class
-# uses rule test4_r
-#
-# run via ninja do_test4
-#build $
-#do_test4 $
-#: test4_r $
-#| $outdir/ExprJoyRide.class
-
-# TEST 5
-#
-# Test with interactive code having errors
-# using the custom test code so that we can
-# see how it handles parse errors.
-#
-
-# RULE: for custom java source
-#rule test5_r
-#  command = echo "(1+2" | java --class-path $CLASSPATH ExprJoyRide 
-#  description = Testing via custom java code and improper input. Missing paren.
-
-# BUILD: depends upon the java test code being built
-# makes: fake output
-# depends upon  $outdir/ExprJoyRide.class
-# uses rule test5_r
-#
-# run via ninja do_test5
-#build $
-#do_test5 $
-#: test5_r $
-#| $outdir/ExprJoyRide.class
-
-
-# TEST 6
-#
-# Test with interactive code having errors
-# using the grun so that we can
-# see how it handles parse errors.
-#
-
-# RULE: for grun command line
-#rule test6_r
-#  command = cd $outdir; echo "(1+2\n33*67" | $grun ArrayInit prog -gui
-#  description = Testing via grun and improper input. Missing paren.
-
-# BUILD: depends upon the java test code being built
-# makes: fake output
-# depends upon  $outdir/ExprJoyRide.class
-# uses rule test5_r
-#
-# run via ninja do_test5
-#build $
-#do_test6 $
-#: test6_r $
-#| $outdir/ExprJoyRide.class
+# do the test
+build $
+do_test3 $
+: test3_r $
+| $outdir/Translate.class

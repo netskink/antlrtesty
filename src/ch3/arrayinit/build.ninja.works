@@ -2,8 +2,14 @@
 # Variables
 #
 outdir = out
-srcdir = starter
+srcdir = antlr
+grammar = ArrayInit
 
+#
+# NOTE: the use of $outdir in the classpath.  This is so that when the 
+# testcode is built, it can reference the .class files built earlier.
+#
+#
 # github codespace
 #CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$srcdir
 # macos terminal
@@ -21,54 +27,76 @@ grun = java org.antlr.v4.runtime.misc.TestRig
 
 
 # rule to transform *.g4 files into *java, *.interp and *.tokens files
+# $in comes from the build statement which uses this rule.
+#
+# rule to antlr a grammar (.g4) file
+#
 rule antlr_r
   command = $antlr4 $in
 
-# Build statement
-# Note the use of dollar sign to escape new lines and variables.
-build $
-$outdir/$srcdir/ArrayInit.tokens $
-$outdir/$srcdir/ArrayInitLexer.tokens $
-$outdir/$srcdir/ArrayInit.interp $
-$outdir/$srcdir/ArrayInitLexer.interp $
-$outdir/$srcdir/ArrayInitBaseListener.java $
-$outdir/$srcdir/ArrayInitLexer.java $
-$outdir/$srcdir/ArrayInitListener.java $
-$outdir/$srcdir/ArrayInitParser.java $
-$outdir/$srcdir $
-: antlr_r $srcdir/ArrayInit.g4
-
-
+#
 # rule to compile java code
+#
 rule jc
   command = javac -d $outdir --class-path $CLASSPATH $in
   description = javac $outdir
 
-# depends upon nothing. Makes class
-# * ArrayInitLexer
-build $outdir/ArrayInitLexer.class: jc $outdir/$srcdir/ArrayInitLexer.java
 
-# depends upon nothing. Makes class files:
-# * ArrayInitBaseListener
-# * ArrayInitListener
-# * ArrayInitParser
-# * ArrayInitParser$InitContext
-# * ArrayInitParser$ValueContext
-build $outdir/ArrayInitParser$$InitContext.class $outdir/ArrayInitParser$$ValueContext.class $outdir/ArrayInitBaseListener.class: jc $outdir/$srcdir/ArrayInitBaseListener.java
 
-# depends upon nothing. Makes class files:
-# * ArrayInitListener
-# * ArrayInitParser
-# * ArrayInitParser$InitContext
-# * ArrayInitParser$ValueContext
-build $outdir/ArrayInitListener.class: jc $outdir/$srcdir/ArrayInitListener.java
+#
+# Build statement to make .java, .tokens and .interp files from .g4
+#
+build $
+$outdir/$srcdir/${grammar}BaseListener.java $
+$outdir/$srcdir/${grammar}Parser.java $
+$outdir/$srcdir/${grammar}Listener.java $
+$outdir/$srcdir/${grammar}Lexer.java $
+$outdir/$srcdir/${grammar}.interp $
+$outdir/$srcdir/${grammar}Lexer.interp $
+$outdir/$srcdir/${grammar}.tokens $
+$outdir/$srcdir/${grammar}Lexer.tokens $
+$outdir/$srcdir $
+: antlr_r $
+$srcdir/${grammar}.g4
 
-# depends upon nothing.  Makes class files:
-# * ArrayInitListener
-# * ArrayInitParser
-# * ArrayInitParser$InitContext
-# * ArrayInitParser$ValueContext
-build $outdir/ArrayInitParser.class: jc $outdir/$srcdir/ArrayInitParser.java
+
+#
+# build rules to make the various java source files
+#
+
+
+#
+# Makes single class.
+#
+build $
+$outdir/${grammar}Lexer.class $
+: jc $
+$outdir/$srcdir/${grammar}Lexer.java
+
+#
+# Makes multiple classes pertaining to parser
+#
+build $
+$outdir/${grammar}Parser.class $
+$outdir/${grammar}Listener.class $
+$outdir/${grammar}Parser$$InitContext.class $
+$outdir/${grammar}Parser$$ValueContext.class $
+$outdir/${grammar}Parser$$ExprContext.class $
+$outdir/${grammar}Parser$$ProgContext.class $
+$outdir/${grammar}Parser$$StatContext.class $
+: jc $
+$outdir/$srcdir/${grammar}Parser.java $
+
+
+
+#
+# Makes multiple classes pertaining to listener
+#
+#
+build $
+$outdir/${grammar}BaseListener.class $
+: jc $
+$outdir/$srcdir/${grammar}BaseListener.java
 
 
 
@@ -76,9 +104,93 @@ build $outdir/ArrayInitParser.class: jc $outdir/$srcdir/ArrayInitParser.java
 # Testing
 #
 
-rule testit
-  command = cd $outdir; echo {1, 2, 3} | $grun ArrayInit init -tokens 
-  description = Testing the tokenizer
+# TEST 1
+#
+# Test with the test TestRig and t.expr
+#
 
-# he does not generate outdir
-build $outdir do_testit: testit $outdir/ArrayInitParser$$InitContext.class
+rule grun_tree_r
+  command = cd $outdir; $grun ${grammar} init -gui ../test/t.expr
+  description = launches org.antlr.v4.runtime.misc.TestRig on t.expr
+
+# depends upon the outdir and the ArrayInitParser.class
+build $
+do_testparse $
+: grun_tree_r $
+$outdir/${grammar}Parser.class
+
+
+# TEST 2
+#
+# Test with the custom java source
+#
+
+
+build $
+$outdir/Test.class $
+: jc test/Test.java $
+| $outdir/${grammar}Lexer.class
+
+
+build $
+$outdir/Test2.class $
+: jc test/Test2.java $
+| $outdir/${grammar}Lexer.class
+
+
+#
+# Now the code to test it via running the custom test code
+#
+rule test2_r
+  command = echo "{1,{2,3},4}" | java --class-path $CLASSPATH Test 
+  description = Testing via custom java code and a sample input 
+
+rule test2b_r
+  command = echo "{1,{2,3},4}" | java --class-path $CLASSPATH Test2 
+  description = Testing via custom java code and a sample input 
+
+
+
+# BUILD: depends upon the java test code being built
+# does the execution
+build $
+do_testit $
+: test2_r $
+| $outdir/Test.class
+
+
+# BUILD: depends upon the java test code being built
+# does the execution
+build $
+do_testit2 $
+: test2b_r $
+| $outdir/Test2.class
+
+
+
+# TEST 3
+#
+# test with translate.java and ShortToUnicodeString 
+# using walker capability
+
+# build the two test java files
+build $
+$outdir/ShortToUnicodeString.class $
+: jc test/ShortToUnicodeString.java $
+| $outdir/${grammar}Lexer.class
+
+build $
+$outdir/Translate.class $
+: jc test/Translate.java $
+| $outdir/ShortToUnicodeString.class
+
+# rule to run test
+rule test3_r
+  command = echo "{1,2}" | java --class-path $CLASSPATH Translate
+  description = Testing via translate java code and a sample input 
+
+# do the test
+build $
+do_test3 $
+: test3_r $
+| $outdir/Translate.class

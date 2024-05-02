@@ -21,6 +21,11 @@ $ source /workspaces/antlrtesty/bin/setenv.sh
 $ source /workspaces/antlrtesty/src/env/bin/activate
 ```
 
+
+Note, the virtual environment is only used if
+I want to run configure.  In most cases, I don't
+have a configure script.
+
 ### Examine the antlr grammar
 
 ```
@@ -134,19 +139,6 @@ Notes regarding counts
 * ids start counting at zero
 * positions start counting at zero
 * lines start counting at one
-
-
-## Building with configure and ninja
-
-### Set environment
-
-Setup antlr alias's and python virtual environment
-
-```
-$ source /workspaces/antlrtesty/bin/setenv.sh
-$ source /workspaces/antlrtesty/src/env/bin/activate
-$ cd src/antlrhw
-```
 
 
 
