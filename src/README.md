@@ -18,7 +18,6 @@ It shows how to:
     - Translate.java uses ParseTreeWalker()
         - walks with ShortToUnicodeString()
 
-* use with Calc.java to 
 
 ## Chapter 4
 
@@ -48,3 +47,4 @@ It shows how to:
         - visitMulDiv
         - visitAddSub
         - visitParens
+* use with Calc.java to 
