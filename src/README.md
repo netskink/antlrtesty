@@ -77,9 +77,12 @@ It shows how to:
     * use with Calc.java to 
         - creates a eval = new EvalVisitor()
         - simply does eval.(tree)
-
-
-
 * interface - section 4.3 building a translator with a Listener
-
+    * This uses a large grammar file - Java.g4
+    * It uses two test files
+        - ExtractInterfaceListener 
+            * extends JavaBaseListener
+        - ExtractInterfaceTool
+            * has main()
+            * does walker.walk(extractor, tree)
 
