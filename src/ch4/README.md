@@ -17,6 +17,8 @@ These are the exercises from ch 4.
 * interface - section 4.3 building a translator with a Listener
 * actions - section 4.4 making things happen during parse
     - uses a tsv file as input to parse
+* actions2 - section 4.4 second half
+    - uses a file containing a sequence 
     
 
 # URLS

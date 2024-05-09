@@ -1,7 +1,7 @@
 #
 # Variables
 #
-grammar = Rows
+grammar = Data
 outdir = out
 antlrdir = antlr
 testdir = test
@@ -85,7 +85,8 @@ $outdir/$antlrdir/${grammar}Lexer.java
 build $
 $outdir/${grammar}Parser.class $
 $outdir/${grammar}Parser$$FileContext.class $
-$outdir/${grammar}Parser$$RowContext.class $
+$outdir/${grammar}Parser$$GroupContext.class $
+$outdir/${grammar}Parser$$SequenceContext.class $
 : jc $
 $outdir/$antlrdir/${grammar}Parser.java 
 
@@ -97,68 +98,41 @@ $outdir/$antlrdir/${grammar}Parser.java
 ##############################
 
 
-# TEST 2
+# TEST 1
 #
-# Test with the custom java source
+# Test with grun text tree
 #
+# -tree 
+rule parseTreeText
+  # This works but the other form is better
+  #command = cd $outdir; $grun ${grammar} file -tree ../test/t.data
+  command = CLASSPATH=$CLASSPATH; $grun ${grammar} file -tree test/t.data
+  description = launches org.antlr.v4.runtime.misc.TestRig
 
-
-#
-# build Col.java 
-# which contains main()
-build $
-$outdir/Col.class $
-: jc $
-$testdir/Col.java $
-| $outdir/${grammar}Lexer.class $outdir/${grammar}Parser.class 
-
-
-#
-# Now the code to test it via running the custom test code
-#
-
-
-# RULE: for custom java source
-rule test1_r
-  command = java --class-path $CLASSPATH Col 1 < test/t.rows
-  description = Testing via custom java code and a sample file for column 1
-
-# BUILD: 
-#
-# run via ninja do_test1
+# depends upon the outdir, ${grammar}Parser.class ${grammar}Lexer.class
 build $
 do_test1 $
-: test1_r $
-| $outdir/Col.class
+: parseTreeText $
+| $outdir/${grammar}Parser.class $outdir/${grammar}Lexer.class
 
 
-# RULE: for custom java source
-rule test2_r
-  command = java --class-path $CLASSPATH Col 2 < test/t.rows
-  description = Testing via custom java code and a sample file for column 2
-
-# BUILD: 
+# TEST 2
 #
-# run via ninja do_test2
+# Test with grun gui tree
+#
+# -gui
+rule parseTreeGui
+  # This works but the other form is better
+  #command = cd $outdir; $grun ${grammar} file -gui ../test/t.data
+  command = CLASSPATH=$CLASSPATH; $grun ${grammar} file -gui test/t.data
+  description = launches org.antlr.v4.runtime.misc.TestRig
+
+# depends upon the outdir, ${grammar}Parser.class ${grammar}Lexer.class
 build $
 do_test2 $
-: test2_r $
-| $outdir/Col.class
+: parseTreeGui $
+| $outdir/${grammar}Parser.class $outdir/${grammar}Lexer.class
 
-
-
-# RULE: for custom java source
-rule test3_r
-  command = java --class-path $CLASSPATH Col 3 < test/t.rows
-  description = Testing via custom java code and a sample file for column 3
-
-# BUILD: 
-#
-# run via ninja do_test3
-build $
-do_test3 $
-: test3_r $
-| $outdir/Col.class
 
 # by default only this target is made
-default do_test3
+#default do_test2

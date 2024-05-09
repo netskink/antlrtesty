@@ -33,9 +33,13 @@ locals [int i=0]
 
 // The STUFF lexical rule matches anything that's not a tab
 // or a newline which means we can have space characters in a column.
+//
+// This has variants for windows and osx
 TAB     : '\t' -> skip  ;       // match but dont pass to the parser
+// Windows
 //NL      : '\r'? '\n'    ;       // match and pass to the parser
 //STUFF   : ~[\t\r\n]+    ;       // match any chars except tab, newline
+// OSX
 NL      : '\n'    ;       // match and pass to the parser
 STUFF   : ~[\t\n]+    ;       // match any chars except tab, newline
 
