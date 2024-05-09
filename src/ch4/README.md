@@ -15,6 +15,9 @@ These are the exercises from ch 4.
             - compares token sequences to particular patterns
 * calc - section 4.2 building a calculator using a Visitor
 * interface - section 4.3 building a translator with a Listener
+* actions - section 4.4 making things happen during parse
+    - uses a tsv file as input to parse
+    
 
 # URLS
 
