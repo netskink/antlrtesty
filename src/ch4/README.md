@@ -15,10 +15,22 @@ These are the exercises from ch 4.
             - compares token sequences to particular patterns
 * calc - section 4.2 building a calculator using a Visitor
 * interface - section 4.3 building a translator with a Listener
-* actions - section 4.4 making things happen during parse
+* actions - section 4.4 (first half) making things happen during parse
     - uses a tsv file as input to parse
-* actions2 - section 4.4 second half
+* actions2 - section 4.4 (second half)
     - uses a file containing a sequence 
+* xmllexer - section 4.5 (first third)
+    - Island Grammars: dealing with Different Formats in the Same File
+    - Island Grammars are like a mini language inside a larger language
+        - @author tags inside Java Comment lines.
+        - Antlr has a lexical mode capability where it can switch modes
+          based upon a special sentinel character sequence.
+        - XML has a similar capability.  When XML sees a `<`, it
+          switches to `inside` mode and switches back to `default` mode
+          when it sees `>` or `/>`.
+    - This example is lexer grammar and not the normal grammar.  
+        - When built it does not make a xxxGrammar.java or xxxLexer.java
+
     
 
 # URLS

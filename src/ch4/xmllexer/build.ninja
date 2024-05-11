@@ -1,0 +1,105 @@
+#
+# Variables
+#
+grammar = XMLLexer
+outdir = out
+antlrdir = antlr
+testdir = test
+
+#
+# NOTE: the use of $outdir in the classpath.  This is so that when the 
+# testcode is built, it can reference the .class files built earlier.
+#
+#
+# github codespace
+#CLASSPATH=.:/workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$antlrdir
+# macos terminal
+# TODO: Do we need the $outdir/$antlrdir because no class files are there.
+CLASSPATH = .:/Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar:$outdir:$outdir/$antlrdir
+
+# ninja does not respect shell aliases
+# github code space
+#antlr4 = java -jar /workspaces/antlrtesty/jars/antlr-4.13.1-complete.jar -o $outdir
+# macos terminal
+antlr4 = java -jar /Users/davis/progs/github/antlrtesty/jars/antlr-4.13.1-complete.jar -o $outdir
+
+# grun
+grun = java org.antlr.v4.runtime.misc.TestRig
+
+
+##############################
+# Rules
+##############################
+
+# rule to transform *.g4 files into *java, *.interp and *.tokens files
+# $in comes from the build statement which uses this rule.
+#
+# NOTE: This sample adds the --no-listener switch.
+# Since -no-visitor (which is the second type) is the 
+# default, in this case we do not make listener
+# or visitor code.
+rule antlr_r
+  command = $antlr4 -no-listener $in
+  description = Converts grammar .g4 file into java source files
+
+
+#
+# rule to compile java code
+#
+rule jc
+  command = javac -d $outdir --class-path $CLASSPATH $in
+  description = compiles java and puts classes in the out dir
+
+
+
+##############################
+# Build Statements
+##############################
+
+# build grammar
+#
+
+build $
+$outdir/$antlrdir/${grammar}.tokens $
+$outdir/$antlrdir/${grammar}.interp $
+$outdir/$antlrdir/${grammar}.java $
+$outdir/$antlrdir $
+: antlr_r $antlrdir/${grammar}.g4
+
+
+
+
+
+# build ${grammar}.java
+#
+build $
+$outdir/${grammar}.class $
+: jc $
+$outdir/$antlrdir/${grammar}.java
+
+
+
+
+##############################
+# Testing
+##############################
+
+
+# TEST 1
+#
+# Test with grun -tokens
+#
+rule grunTokens
+  command = CLASSPATH=$CLASSPATH; $grun ${grammar} tokens -tokens test/t.xml
+  #command = CLASSPATH=$CLASSPATH; $grun XML tokens -tokens test/t.xml
+  description = launches org.antlr.v4.runtime.misc.TestRig
+
+# depends upon the outdir, ${grammar}.class 
+build $
+do_test1 $
+: grunTokens $
+| $outdir/${grammar}.class 
+
+
+# by default only this target is made
+#default do_test2
