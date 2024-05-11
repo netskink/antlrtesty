@@ -30,7 +30,12 @@ These are the exercises from ch 4.
           when it sees `>` or `/>`.
     - This example is lexer grammar and not the normal grammar.  
         - When built it does not make a xxxGrammar.java or xxxLexer.java
-
+* insertserialid - section 4.5 (second third)
+    - starts with translator example
+    - processes java source code to insert serialization identifiers
+        - eg serialVersionUID
+    - same as the translator example, but when done with listener
+    we print out the altered stream
     
 
 # URLS

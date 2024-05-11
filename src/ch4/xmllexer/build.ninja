@@ -89,6 +89,10 @@ $outdir/$antlrdir/${grammar}.java
 #
 # Test with grun -tokens
 #
+# NOTE: in this case, he does gammar name and tokens, rather
+# than grammar name and rule.  Tokens is a special rule that
+# says to run the lexer but not the parser.  The -tokens option
+# prints out the list of matched tokens.
 rule grunTokens
   command = CLASSPATH=$CLASSPATH; $grun ${grammar} tokens -tokens test/t.xml
   #command = CLASSPATH=$CLASSPATH; $grun XML tokens -tokens test/t.xml
