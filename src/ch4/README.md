@@ -36,6 +36,8 @@ These are the exercises from ch 4.
         - eg serialVersionUID
     - same as the translator example, but when done with listener
     we print out the altered stream
+* - section 4.5 (final third) Sending Tokens on Different Channels
+    - no code for this section.   Its just some explanation text
     
 
 # URLS
