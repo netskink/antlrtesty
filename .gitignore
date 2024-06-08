@@ -5,6 +5,10 @@
 # for finder
 .DS_Store
 
+# for the vscode-antlr4 plugin
+# https://github.com/mike-lischke/vscode-antlr4/issues/16
+.antlr/
+
 
 
 # It turns out gn does not do Java.  Need to remove these settings

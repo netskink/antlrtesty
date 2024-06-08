@@ -88,5 +88,11 @@ It shows how to:
 * actions - section 4.4 making things happen during parse
     - uses a tsv file as input to parse
     - Uses grammar file - Rows.g4
-    - 
+## Chapter 5
+
+This is just a good read.  No real code to implement.
+
+## Chapter 6
+
+This chapter builds lexers in increasing complexity.
 
