@@ -12,4 +12,6 @@ $ brew install graphviz
 ## Usage on osx
 
 ```
+$ dot -Tpng t0.dot > t0.png
+$ open t0.png
 ```
