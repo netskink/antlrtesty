@@ -1,5 +1,46 @@
 
-# Fresh Install
+# Java install on macOS
+
+## specific version
+
+This installs a specific version on macOS
+
+```
+$ brew install --cask semeru-jdk-open@17
+```
+
+## select specific version
+
+```
+$ export JAVA_HOME=`/usr/libexec/java_home -v 17`
+$ java --version
+openjdk 17.0.11 2024-04-16
+IBM Semeru Runtime Open Edition 17.0.11.0 (build 17.0.11+9)
+Eclipse OpenJ9 VM 17.0.11.0 (build openj9-0.44.0, JRE 17 Mac OS X aarch64-64-Bit 20240416_599 (JIT enabled, AOT enabled)
+OpenJ9   - b0699311c7
+OMR      - 254af5a04
+JCL      - 5d7d758b682 based on jdk-17.0.11+9)
+$ export JAVA_HOME=`/usr/libexec/java_home -v 19`
+$ java --version
+openjdk 19.0.2 2023-01-17
+OpenJDK Runtime Environment (build 19.0.2+7-44)
+OpenJDK 64-Bit Server VM (build 19.0.2+7-44, mixed mode, sharing)
+```
+
+# Maven install on macOS
+
+```
+$ brew install mvn
+```
+
+
+
+
+# Fresh Install of Antlr
+
+By default, I did not need to install java.  However, if you need
+to install a particular java version use the process above
+to install and switch java versions.
 
 1. get the jar
     * `mkdir jars`
@@ -30,6 +71,7 @@
         * it will build code using compiler
     * disable git so the repo does not have a submodule
     * `rm -rf .git`
+
 
 # Resuming work
 
